@@ -68,7 +68,7 @@ namespace XenoPacker
             reader.ReadByte();  // file size need padding
             var files = new List<FileEntry>();
             var folders = new List<string>();
-            var currentFolder = string.Empty;
+            var currentFolder = Path.DirectorySeparatorChar.ToString();
 
             bool finished = false;
             while (!finished) {

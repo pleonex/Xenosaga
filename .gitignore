@@ -1,3 +1,6 @@
+## Ignore Game Data
+GameData/
+
 ## Ignore automation results
 Programs/Automation/*.html
 
