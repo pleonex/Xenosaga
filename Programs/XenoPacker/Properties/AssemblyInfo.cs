@@ -18,8 +18,10 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Mono.Addins;
 
 [assembly: AssemblyTitle("XenoPacker")]
@@ -31,4 +33,6 @@ using Mono.Addins;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.0.*")]
+[assembly: CLSCompliant(true)]
+[assembly: ComVisibleAttribute(true)]
 [assembly: Addin("XenoPacker", "1.0")]

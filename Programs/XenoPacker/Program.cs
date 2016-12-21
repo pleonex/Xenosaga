@@ -21,9 +21,9 @@
 namespace XenoPacker
 {
     using System;
-    using System.IO;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using Libgame.IO;
 
@@ -68,7 +68,7 @@ namespace XenoPacker
             reader.ReadByte();  // file size need padding
             var files = new List<FileEntry>();
             var folders = new List<string>();
-            var currentFolder = "";
+            var currentFolder = string.Empty;
 
             bool finished = false;
             while (!finished) {
@@ -81,7 +81,7 @@ namespace XenoPacker
                 }
 
                 // If the first bit is set, it's a folder
-                if ((flag & 0x80)!= 0) {
+                if ((flag & 0x80) != 0) {
                     // Read the folder info
                     int dirNameSize = (flag & 0x7F) - 2;
                     var dirLevel = reader.ReadByte();

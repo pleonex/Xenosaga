@@ -21,33 +21,38 @@
 namespace XenoPacker
 {
     using System;
+    using System.Globalization;
 
     struct FileEntry
     {
+        readonly byte[] unknown;
+
         public FileEntry(string name, uint offset, uint size, byte[] unk)
             : this()
         {
             Name = name;
             Offset = offset;
             Size = size;
-            Unknown = unk;
+            unknown = unk;
         }
 
         public static uint Padding { get; } = 0x800;
 
         public string Name { get; private set; }
+
         public uint Offset { get; private set; }
+
         public uint Size { get; private set; }
-        public byte[] Unknown { get; private set; }
 
         public override string ToString()
         {
             return string.Format(
+                CultureInfo.InvariantCulture,
                 "[FileEntry: @{{{1:X10}, {2:X8}, {3}}} {0}]",
                 Name,
                 Offset,
                 Size,
-                BitConverter.ToString(Unknown));
+                BitConverter.ToString(unknown));
         }
     }
 }
