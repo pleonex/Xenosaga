@@ -21,17 +21,17 @@
 namespace XenoPacker
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
+    using Libgame.FileFormat;
+    using Libgame.FileSystem;
     using Libgame.IO;
 
     static class Program
     {
         public static void Main(string[] args)
         {
-            if (args.Length < 3 || args.Length > 3) {
+            if (args.Length != 3) {
                 Console.WriteLine("USAGE: XenoPacker input position outputDir");
                 return;
             }
@@ -55,94 +55,26 @@ namespace XenoPacker
 
         static void Export(DataStream stream, string outputDir)
         {
-            foreach (FileEntry file in ReadFnt(stream)) {
-                Console.WriteLine(file);
-                ExtractFile(stream, file, outputDir);
+            using (Node root = new Node("root", new BinaryFormat(stream))) {
+                root.Transform<BinaryFormat, NodeContainerFormat, Unpacker>(true);
+
+                foreach (var node in Navigator.IterateNodes(root))
+                    ExtractNode(node, outputDir);
             }
         }
 
-        static FileEntry[] ReadFnt(DataStream stream)
+        static void ExtractNode(Node node, string baseDir)
         {
-            var reader = new DataReader(stream);
+            if (node.IsContainer)
+                return;
 
-            reader.ReadByte();  // file size need padding
-            var files = new List<FileEntry>();
-            var folders = new List<string>();
-            var currentFolder = Path.DirectorySeparatorChar.ToString();
-
-            bool finished = false;
-            while (!finished) {
-                byte flag = reader.ReadByte();
-
-                // End
-                if (flag == 0x00) {
-                    finished = true;
-                    continue;
-                }
-
-                // If the first bit is set, it's a folder
-                if ((flag & 0x80) != 0) {
-                    // Read the folder info
-                    int dirNameSize = (flag & 0x7F) - 2;
-                    var dirLevel = reader.ReadByte();
-                    var dirName = new string(reader.ReadChars(dirNameSize));
-
-                    while (folders.Count <= dirLevel)
-                        folders.Add(string.Empty);
-
-                    // Get the base directory
-                    folders[dirLevel] = dirName;
-                    var baseDir = string.Join(
-                        Path.DirectorySeparatorChar.ToString(),
-                        folders.Take(dirLevel));
-
-                    // Combine to get the current folder.
-                    currentFolder = Path.Combine(baseDir, dirName);
-
-                    continue;
-                }
-
-                // The name size includes the null char but it's not in the file
-                int nameSize = (flag & 0x1F) - 1;
-                string name = new string(reader.ReadChars(nameSize));
-                name = Path.Combine(currentFolder, name);
-
-                // The offset is just 3 bytes padded 0x800
-                uint offset = (uint)(reader.ReadByte() |
-                    reader.ReadByte() << 8 |
-                    reader.ReadByte() << 16);
-                offset *= FileEntry.Padding;
-
-                // The size are the next 4 bytes.
-                uint size = reader.ReadUInt32();
-
-                // Extra unknown bytes
-                int unknownSize = (flag & 0xE0) >> 5;
-                var unknown = new byte[0];
-                if (unknownSize != 0) {
-                    unknown = reader.ReadBytes(unknownSize + 1);
-                }
-
-                files.Add(new FileEntry(name, offset, size, unknown));
-            }
-
-            return files.ToArray();
-        }
-
-        static void ExtractFile(DataStream stream, FileEntry fileInfo, string baseDir)
-        {
-            int relativeDirIdx = fileInfo.Name.LastIndexOf(Path.DirectorySeparatorChar);
-            string relativeDir = fileInfo.Name.Substring(0, relativeDirIdx);
-            string filename = fileInfo.Name.Substring(relativeDirIdx + 1);
-
-            string outputDir = Path.Combine(baseDir, relativeDir);
-            string outputFile = Path.Combine(outputDir, filename);
+            string outputDir = Path.Combine(baseDir, node.Parent?.Path.TrimStart('/'));
+            string outputFile = Path.Combine(outputDir, node.Name);
             if (!Directory.Exists(outputDir))
                 Directory.CreateDirectory(outputDir);
 
-            using (var dataStream = new DataStream(stream, fileInfo.Offset, fileInfo.Size)) {
-                dataStream.WriteTo(outputFile);
-            }
+            Console.WriteLine(node.Path + " --> " + outputFile);
+            node.GetFormatAs<BinaryFormat>()?.Stream.WriteTo(outputFile);
         }
     }
 }

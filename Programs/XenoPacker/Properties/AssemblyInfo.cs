@@ -33,6 +33,6 @@ using Mono.Addins;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.0.*")]
-[assembly: CLSCompliant(true)]
-[assembly: ComVisibleAttribute(true)]
+[assembly: CLSCompliant(false)]
+[assembly: ComVisibleAttribute(false)]
 [assembly: Addin("XenoPacker", "1.0")]
