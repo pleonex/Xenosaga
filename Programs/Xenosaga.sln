@@ -1,0 +1,43 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libgame", "libgame\libgame\libgame.csproj", "{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XenoPacker", "XenoPacker\XenoPacker.csproj", "{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XenoJavusk", "XenoJavusk\XenoJavusk.csproj", "{13B6C95B-C926-4424-8E7C-02524E1B952E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Debug|x86.Build.0 = Debug|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Release|x86.ActiveCfg = Release|Any CPU
+		{47373F3F-6A6A-4B2A-B06E-971D9FBDB545}.Release|x86.Build.0 = Release|Any CPU
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Debug|Any CPU.Build.0 = Debug|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Release|Any CPU.ActiveCfg = Release|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Release|Any CPU.Build.0 = Release|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Debug|x86.ActiveCfg = Debug|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Debug|x86.Build.0 = Debug|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Release|x86.ActiveCfg = Release|x86
+		{6AF9E962-85CA-429D-97FB-3C3C4D885E2D}.Release|x86.Build.0 = Release|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Debug|Any CPU.Build.0 = Debug|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Release|Any CPU.ActiveCfg = Release|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Release|Any CPU.Build.0 = Release|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Debug|x86.ActiveCfg = Debug|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Debug|x86.Build.0 = Debug|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Release|x86.ActiveCfg = Release|x86
+		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
