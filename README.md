@@ -14,3 +14,10 @@ The address depends on the ISO type. These are some of them:
     * Part 0: `539000`
     * Part 1: `557D3000`
     * Part 2: `FD9C7800`
+
+### XenoJavusk
+Extract text from files with *.ext* extension. The program arguments are:
+
+```sh
+[mono] XenoJavusk.exe FolderWithEvtFiles
+```
