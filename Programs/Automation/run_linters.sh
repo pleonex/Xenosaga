@@ -9,6 +9,8 @@ function check_program() {
     gendarme --ignore "Automation/gendarme_$PROGRAM.ignore" --html "Automation/gendarme_$PROGRAM.html" "$PROGRAM"/bin/Debug/"$PROGRAM".{exe,dll}
 }
 
+xbuild Xenosaga.sln
+
 check_program XenoPacker
 check_program XenoJavusk
 

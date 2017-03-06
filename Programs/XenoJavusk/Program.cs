@@ -28,7 +28,7 @@ namespace XenoJavusk
     using System.Xml.Linq;
     using Libgame.IO;
 
-    class MainClass
+    static class Program
     {
         public static void Main(string[] args)
         {
@@ -84,9 +84,9 @@ namespace XenoJavusk
                 var filename = reader.ReadString(nameSize);
 
                 // Process file
-                var javaClassStream = new DataStream(fileStream, fileOffset, fileSize);
                 var outputFile = Path.Combine(baseFolder, filename);
-                ExtractJavaConstant(javaClassStream, outputFile);
+                using (var javaClassStream = new DataStream(fileStream, fileOffset, fileSize))
+                    ExtractJavaConstant(javaClassStream, outputFile);
             }
         }
 
@@ -119,7 +119,7 @@ namespace XenoJavusk
             }
 
             var stringLiterals = utf8Constants.Where(item => stringsIdx.Contains(item.Key));
-            if (stringLiterals.Count() == 0)
+            if (!stringLiterals.Any())
                 return;
 
             var xml = new XDocument();
@@ -136,11 +136,6 @@ namespace XenoJavusk
             }
 
             xml.Save(outputFile + ".xml");
-        }
-
-        static bool IsConstantPoolStringItem(byte tag)
-        {
-            return tag == 1;
         }
 
         static int GetConstantPoolItemInfoLength(byte tag)
