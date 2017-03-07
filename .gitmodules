@@ -1,3 +1,6 @@
 [submodule "Programs/libgame"]
 	path = Programs/libgame
 	url = git@github.com:pleonex/libgame
+[submodule "Programs/Binedi"]
+	path = Programs/Binedi
+	url = git@github.com:pleonex/Binedi.git
