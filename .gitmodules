@@ -4,3 +4,6 @@
 [submodule "Programs/Binedi"]
 	path = Programs/Binedi
 	url = git@github.com:pleonex/Binedi.git
+[submodule "Programs/External/FFmpeg"]
+	path = Programs/External/FFmpeg
+	url = git@github.com:pleonex/FFmpeg
