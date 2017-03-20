@@ -107,11 +107,11 @@ namespace XenoJavusk
             var stringsIdx = new List<int>();
             var constantPoolCount = reader.ReadUInt16();
             for (int i = 0; i < constantPoolCount - 1; i++) {
-                var tag = reader.ReadByte();
-                if (tag == 1) {
+                ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
+                if (tag == ConstantPoolTag.Utf8) {
                     var text = reader.ReadString(reader.ReadUInt16());
                     utf8Constants.Add(i, text);
-                } else if (tag == 8) {
+                } else if (tag == ConstantPoolTag.String) {
                     stringsIdx.Add(reader.ReadUInt16() - 1);
                 } else {
                     reader.ReadBytes(GetConstantPoolItemInfoLength(tag));
@@ -138,38 +138,55 @@ namespace XenoJavusk
             xml.Save(outputFile + ".xml");
         }
 
-        static int GetConstantPoolItemInfoLength(byte tag)
+        static int GetConstantPoolItemInfoLength(ConstantPoolTag tag)
         {
             switch (tag) {
-            case 7:
-                return 2;   // class
-            case 9:
-                return 4;   // field ref
-            case 10:
-                return 4;   // method ref
-            case 11:
-                return 4;   // interface method ref
-            case 8:
-                return 2;   // string
-            case 3:
-                return 4;   // integer
-            case 4:
-                return 4;   // float
-            case 5:
-                return 8;   // long
-            case 6:
-                return 8;   // double
-            case 12:
-                return 4;   // name and type
-            case 15:
-                return 3;   // method handle
-            case 16:
-                return 2;   // method type
-            case 18:
-                return 4;   // invoke dynamic
+            case ConstantPoolTag.Class:
+                return 2;
+            case ConstantPoolTag.FieldRef:
+                return 4;
+            case ConstantPoolTag.MethodRef:
+                return 4;
+            case ConstantPoolTag.InterfaceMethodRef:
+                return 4;
+            case ConstantPoolTag.String:
+                return 2;
+            case ConstantPoolTag.Integer:
+                return 4;
+            case ConstantPoolTag.Float:
+                return 4;
+            case ConstantPoolTag.Long:
+                return 8;
+            case ConstantPoolTag.Double:
+                return 8;
+            case ConstantPoolTag.NameAndType:
+                return 4;
+            case ConstantPoolTag.MethodHandle:
+                return 3;
+            case ConstantPoolTag.MethodType:
+                return 2;
+            case ConstantPoolTag.InvokeDynamic:
+                return 4;
             default:
                 throw new FormatException("Unknown tag");
             }
+        }
+
+        enum ConstantPoolTag : byte {
+            Utf8 = 1,
+            Integer = 3,
+            Float = 4,
+            Long = 5,
+            Double = 6,
+            Class = 7,
+            String = 8,
+            FieldRef = 9,
+            MethodRef = 10,
+            InterfaceMethodRef = 11,
+            NameAndType = 12,
+            MethodHandle = 15,
+            MethodType = 16,
+            InvokeDynamic = 18
         }
     }
 }
