@@ -7,3 +7,6 @@
 [submodule "Programs/External/FFmpeg"]
 	path = Programs/External/FFmpeg
 	url = git@github.com:pleonex/FFmpeg
+[submodule "Programs/External/jd-gui"]
+	path = Programs/External/jd-gui
+	url = https://github.com/java-decompiler/jd-gui
