@@ -44,7 +44,7 @@ namespace XenoJavusk
             foreach (var evtFile in Directory.GetFiles(folder, "*.evt")) {
                 var filename = Path.GetFileNameWithoutExtension(evtFile);
                 var baseFolder = Path.Combine(folder, filename);
-                using (var fileStream = new DataStream(evtFile, FileMode.Open, FileAccess.Read))
+                using (var fileStream = new DataStream(evtFile, FileOpenMode.Read))
                     ExtractFl00(fileStream, baseFolder);
             }
         }
@@ -73,14 +73,14 @@ namespace XenoJavusk
             // Read FAT and process files
             for (int i = 0; i < numFiles; i++) {
                 // Read FAT
-                fileStream.Seek(0x14 + (i * 0x10), SeekMode.Origin);
+                fileStream.Seek(0x14 + (i * 0x10), SeekMode.Start);
                 var nameOffset = reader.ReadUInt32();
                 var nameSize = reader.ReadInt32();
                 var fileOffset = reader.ReadUInt32();
                 var fileSize = reader.ReadUInt32();
 
                 // Read filename
-                fileStream.Seek(nameOffset, SeekMode.Origin);
+                fileStream.Seek(nameOffset, SeekMode.Start);
                 var filename = reader.ReadString(nameSize);
 
                 // Process file
@@ -93,7 +93,10 @@ namespace XenoJavusk
         static void ExtractJavaConstant(DataStream classStream, string outputFile)
         {
             classStream.WriteTo(outputFile);
-            var reader = new DataReader(classStream, EndiannessMode.BigEndian, Encoding.UTF8);
+            var reader = new DataReader(classStream) {
+                Endianness = EndiannessMode.BigEndian,
+                DefaultEncoding = Encoding.UTF8
+            };
 
             // Read header
             var magicStamp = reader.ReadUInt32();

@@ -81,7 +81,7 @@ namespace XenoPacker
                     // Read the folder info
                     int dirNameSize = (flag & 0x7F) - 2;
                     var dirLevel = reader.ReadByte();
-                    var dirName = new string(reader.ReadChars(dirNameSize));
+                    var dirName = reader.ReadString(dirNameSize);
 
                     while (folders.Count <= dirLevel)
                         folders.Add(Path.DirectorySeparatorChar.ToString());
@@ -100,7 +100,7 @@ namespace XenoPacker
 
                 // The name size includes the null char but it's not in the file
                 int nameSize = (flag & 0x1F) - 1;
-                string name = new string(reader.ReadChars(nameSize));
+                string name = reader.ReadString(nameSize);
 
                 // The offset is just 3 bytes padded 0x800
                 uint offset = (uint)(reader.ReadByte() |
