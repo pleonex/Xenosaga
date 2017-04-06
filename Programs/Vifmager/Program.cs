@@ -51,7 +51,8 @@ namespace Vifmager
         static void ConvertToImage(string input, string output)
         {
             using (DataStream inputStream = new DataStream(input, FileOpenMode.Read)) {
-                using (DataStream vifPackets = new DataStream(inputStream, 0, 0x78040)) {
+                int size = Path.GetExtension(input) == ".tex" ? 0x78040 : -1;
+                using (DataStream vifPackets = new DataStream(inputStream, 0, size)) {
                     Node rawNode = new Node(
                             Path.GetFileName(input),
                             new BinaryFormat(vifPackets));
