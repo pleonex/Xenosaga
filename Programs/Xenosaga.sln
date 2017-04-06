@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XenoPacker", "XenoPacker\Xe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XenoJavusk", "XenoJavusk\XenoJavusk.csproj", "{13B6C95B-C926-4424-8E7C-02524E1B952E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vifmager", "Vifmager\Vifmager.csproj", "{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,5 +41,13 @@ Global
 		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Debug|x86.Build.0 = Debug|x86
 		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Release|x86.ActiveCfg = Release|x86
 		{13B6C95B-C926-4424-8E7C-02524E1B952E}.Release|x86.Build.0 = Release|x86
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B0E7409-FE7C-4261-BABC-2F8450AEC7E2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

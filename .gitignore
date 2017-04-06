@@ -12,6 +12,7 @@ Programs/Automation/*.html
 *.user
 *.userosscache
 *.sln.docstates
+.addins
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
