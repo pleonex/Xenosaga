@@ -31,6 +31,7 @@ namespace Vifmager
     using Libgame.FileFormat;
     using Libgame.FileSystem;
     using Libgame.IO;
+    using Gif;
     using Vif;
 
     public class Program
@@ -53,15 +54,34 @@ namespace Vifmager
             using (DataStream inputStream = new DataStream(input, FileOpenMode.Read)) {
                 int size = Path.GetExtension(input) == ".tex" ? 0x78040 : -1;
                 using (DataStream vifPackets = new DataStream(inputStream, 0, size)) {
+                    // Create the node with the stream
                     Node rawNode = new Node(
                             Path.GetFileName(input),
                             new BinaryFormat(vifPackets));
 
+                    // Read the stream to get the VIF packets
                     rawNode.Transform<VifPacketList>();
                     foreach (VifPacket packet in rawNode.GetFormatAs<VifPacketList>().Packets)
                         Console.WriteLine(packet);
+
+                    // Get the data to transfer to the GIF
+                    DataStream gifStream = new DataStream();
+                    WriteGifData(gifStream, rawNode.GetFormatAs<VifPacketList>());
+                    rawNode.Format = new BinaryFormat(gifStream);
+
+                    // Read the GIF stream to get the image
+                    rawNode.Transform<GifPacketList>();
+                    foreach (GifPacket packet in rawNode.GetFormatAs<GifPacketList>().Packets)
+                        Console.WriteLine(packet);
                 }
             }
+        }
+
+        static void WriteGifData(DataStream gifStream, VifPacketList vifPackets)
+        {
+            foreach (VifPacket pkt in vifPackets.Packets)
+                if (pkt.Command == VifCommands.DirectHl)
+                    gifStream.Write(pkt.Data, 0, pkt.Data.Length);
         }
     }
 }
