@@ -40,7 +40,7 @@
     <Compile Include="Vif\VifCommands.cs" />
     <Compile Include="Vif\BinaryVifConverter.cs" />
     <Compile Include="Gif\GifPacket.cs" />
-    <Compile Include="Gif\GifTagFlags.cs" />
+    <Compile Include="Gif\GifPacketKind.cs" />
     <Compile Include="Gif\GifRegisters.cs" />
     <Compile Include="Gif\GifPacketList.cs" />
     <Compile Include="Gif\BinaryGifConverter.cs" />

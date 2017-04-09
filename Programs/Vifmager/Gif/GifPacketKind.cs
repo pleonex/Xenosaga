@@ -25,9 +25,9 @@
 // THE SOFTWARE.
 namespace Vifmager.Gif
 {
-    public enum GifTagFlags : byte
+    public enum GifPacketKind : byte
     {
-        Packet = 0x00,
+        Packed = 0x00,
         RegList = 0x01,
         Image = 0x02,
         Disable = 0x03

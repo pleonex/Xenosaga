@@ -25,8 +25,10 @@
 // THE SOFTWARE.
 namespace Vifmager.Vif
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using Libgame.IO;
     using Libgame.FileFormat;
     using Mono.Addins;
 
@@ -51,6 +53,27 @@ namespace Vifmager.Vif
         public void AddPacket(VifPacket packet)
         {
             packets.Add(packet);
+        }
+
+        public void WriteGifData(DataStream gifStream)
+        {
+            foreach (VifPacket pkt in Packets) {
+                switch (pkt.Command) {
+                case VifCommands.DirectHl:
+                    gifStream.Write(pkt.Data, 0, pkt.Data.Length);
+                    break;
+
+                case VifCommands.Nop:
+                    break;
+
+                case VifCommands.Flush:
+                    Console.WriteLine("[VIF] Flusing");
+                    break;
+
+                default:
+                    throw new FormatException("Unsupported command");
+                }
+            }
         }
     }
 }

@@ -47,9 +47,9 @@ namespace Vifmager.Gif
                 reader.ReadUInt16();  // Reserved
 
                 uint flags2 = reader.ReadUInt32();
-                packet.IgnorePrimField = ((flags2 >> 15) & 1) == 1;
+                packet.IgnorePrimField = ((flags2 >> 15) & 1) == 0;
                 packet.Prim = (short)((flags2 >> 16) & 0x3FF);
-                packet.Flags = (GifTagFlags)((flags2 >> 26) & 0x3);
+                packet.Kind = (GifPacketKind)((flags2 >> 26) & 0x3);
                 int numRegisters = (int)((flags2 >> 28) & 0xF);
                 if (numRegisters == 0)
                     numRegisters = 16;
@@ -60,19 +60,21 @@ namespace Vifmager.Gif
                     packet.Registers[i] = (GifRegisters)((registers >> (i * 4)) & 0xF);
 
                 int dataSize = 0;
-                switch (packet.Flags) {
-                case GifTagFlags.Packet:
+                switch (packet.Kind) {
+                case GifPacketKind.Packed:
                     dataSize = numRegisters * packet.Loops * 16;
                     break;
-                case GifTagFlags.RegList:
+                case GifPacketKind.RegList:
                     dataSize = numRegisters * packet.Loops * 8;
                     break;
-                case GifTagFlags.Image:
+                case GifPacketKind.Image:
                     dataSize = packet.Loops * 16;
                     break;
                 }
 
-                packet.Data = reader.ReadBytes(dataSize);
+                packet.Data = new DataStream(source.Stream, source.Stream.Position, dataSize);
+                source.Stream.Seek(dataSize, SeekMode.Current);
+
                 packets.AddPacket(packet);
             }
 

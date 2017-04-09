@@ -27,9 +27,6 @@ namespace Vifmager
 {
     using System;
     using System.IO;
-    using Libgame;
-    using Libgame.FileFormat;
-    using Libgame.FileSystem;
     using Libgame.IO;
     using Gif;
     using Vif;
@@ -38,51 +35,36 @@ namespace Vifmager
     {
         public static int Main(string[] args)
         {
-            if (args.Length < 2) {
-                Console.WriteLine("USAGE: vifmager FileToConvert Output");
+            if (args.Length < 1) {
+                Console.WriteLine("USAGE: vifmager FileToConvert");
                 return 1;
             }
 
-            var a = PluginManager.Instance;
-            ConvertToImage(args[0], args[1]);
+            ConvertToImage(args[0]);
 
             return 0;
         }
 
-        static void ConvertToImage(string input, string output)
+        static void ConvertToImage(string input)
         {
-            using (DataStream inputStream = new DataStream(input, FileOpenMode.Read)) {
-                int size = Path.GetExtension(input) == ".tex" ? 0x78040 : -1;
-                using (DataStream vifPackets = new DataStream(inputStream, 0, size)) {
-                    // Create the node with the stream
-                    Node rawNode = new Node(
-                            Path.GetFileName(input),
-                            new BinaryFormat(vifPackets));
+            // First read the VIF packets.
+            // If it's a font texture file, the size is constant since after the data
+            // it's the variable width table.
+            int size = (Path.GetExtension(input) == ".tex") ? 0x78040 : -1;
+            VifPacketList vifPackets;
+            using (var inputStream = new DataStream(input, 0, size, FileOpenMode.Read))
+                vifPackets = inputStream.ReadFormat<VifPacketList>();
 
-                    // Read the stream to get the VIF packets
-                    rawNode.Transform<VifPacketList>();
-                    foreach (VifPacket packet in rawNode.GetFormatAs<VifPacketList>().Packets)
-                        Console.WriteLine(packet);
-
-                    // Get the data to transfer to the GIF
-                    DataStream gifStream = new DataStream();
-                    WriteGifData(gifStream, rawNode.GetFormatAs<VifPacketList>());
-                    gifStream.Position = 0;
-                    rawNode.Format = new BinaryFormat(gifStream);
-
-                    // Read the GIF stream to get the image
-                    rawNode.Transform<GifPacketList>();
-                    foreach (GifPacket packet in rawNode.GetFormatAs<GifPacketList>().Packets)
-                        Console.WriteLine(packet);
-                }
+            // Now from the VIF packets get the GIF packets
+            GifPacketList gifPackets;
+            using (var gifStream = new DataStream()) {
+                vifPackets.WriteGifData(gifStream);
+                gifStream.Position = 0;
+                gifPackets = gifStream.ReadFormat<GifPacketList>();
             }
-        }
 
-        static void WriteGifData(DataStream gifStream, VifPacketList vifPackets)
-        {
-            foreach (VifPacket pkt in vifPackets.Packets)
-                if (pkt.Command == VifCommands.DirectHl)
-                    gifStream.Write(pkt.Data, 0, pkt.Data.Length);
+            // Finally get the image by processing the GIF commands
+            gifPackets.WriteImageData();
         }
     }
 }

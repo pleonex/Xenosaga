@@ -26,6 +26,7 @@
 namespace Vifmager.Gif
 {
     using System.Linq;
+    using Libgame.IO;
 
     public class GifPacket
     {
@@ -33,10 +34,10 @@ namespace Vifmager.Gif
         public bool FinalPacket { get; set; }
         public bool IgnorePrimField { get; set; }
         public short Prim { get; set; }
-        public GifTagFlags Flags { get; set; }
+        public GifPacketKind Kind { get; set; }
         public GifRegisters[] Registers { get; set; }
 
-        public byte[] Data { get; set; }
+        public DataStream Data { get; set; }
 
         public override string ToString()
         {
@@ -46,9 +47,11 @@ namespace Vifmager.Gif
                 FinalPacket,
                 IgnorePrimField,
                 Prim,
-                Flags,
-                Registers.Select(reg => reg.ToString()).Aggregate((aggr, next) => next + "," + aggr),
-                Data?.Length ?? 0);
+                Kind,
+                Kind != GifPacketKind.Image
+                    ? Registers.Select(reg => reg.ToString()).Aggregate((aggr, next) => next + "," + aggr)
+                    : "",
+                Data?.Length ?? -1);
         }
     }
 }
