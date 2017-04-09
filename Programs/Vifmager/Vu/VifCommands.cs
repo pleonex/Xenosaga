@@ -1,5 +1,5 @@
 ﻿//
-// GifRegisters.cs
+// VifCode.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -23,25 +23,33 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace Vifmager.Gif
+namespace Vifmager.Vu
 {
-    public enum GifRegisters : byte
+    /// <summary>
+    /// Command for the VIF.
+    /// </summary>
+    public enum VifCommands : byte
     {
-        Prim = 0x00,
-        RgbaQ = 0x01,
-        St = 0x02,
-        Uv = 0x03,
-        XyzF2 = 0x04,
-        Xyz2 = 0x05,
-        Tex0_1 = 0x06,
-        Tex0_2 = 0x07,
-        Clamp_1 = 0x08,
-        Clamp_2 = 0x09,
-        Fog = 0x0A,
-        Invalid = 0x0B,
-        XyzF3 = 0x0C,
-        Xyz3 = 0x0D,
-        APlusD = 0x0E,
-        Nop = 0x0F
+        Nop = 0x00,
+        StCycl = 0x01,
+        Offset = 0x02,
+        Base = 0x03,
+        Itops = 0x04,
+        StMod = 0x05,
+        MskPath3 = 0x06,
+        Mark = 0x07,
+        FlushE = 0x10,
+        Flush = 0x11,
+        FlushA = 0x13,
+        MsCal = 0x14,
+        MsCnt = 0x17,
+        MsCalf = 0x15,
+        StMask = 0x20,
+        StRow = 0x30,
+        StCol = 0x31,
+        Mpg = 0x4A,
+        Direct = 0x50,
+        DirectHl = 0x51,
+        Unpack = 0x60
     }
 }

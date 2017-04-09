@@ -1,5 +1,5 @@
 ﻿//
-// VifPacket.cs
+// GifPacket.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -23,26 +23,35 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace Vifmager.Vif
+namespace Vifmager.Gs
 {
-    /// <summary>
-    /// Command and data for the VIF.
-    /// </summary>
-    public class VifPacket
-    {
-        public VifCommands Command { get; set; }
-        public int Num { get; set; }
-        public int Immediate { get; set; }
+    using System.Linq;
+    using Libgame.IO;
 
-        public byte[] Data { get; set; }
+    public class GifPacket
+    {
+        public short Loops { get; set; }
+        public bool FinalPacket { get; set; }
+        public bool IgnorePrimField { get; set; }
+        public short Prim { get; set; }
+        public GifPacketKind Kind { get; set; }
+        public GifRegisters[] Registers { get; set; }
+
+        public DataStream Data { get; set; }
 
         public override string ToString()
         {
-            return string.Format("[VifPacket: CMD={0}, NUM={1}, IMMEDIATE={2}, DATA={3}]",
-                                 Command,
-                                 Num,
-                                 Immediate,
-                                 Data?.Length ?? -1);
+            return string.Format(
+                "[GifPacket: NLOOP={0}, EOP={1}, PRE={2}, PRIM={3}, FLG={4}, REGS={5}, DATA={6}]",
+                Loops,
+                FinalPacket,
+                IgnorePrimField,
+                Prim,
+                Kind,
+                Kind != GifPacketKind.Image
+                    ? Registers.Select(reg => reg.ToString()).Aggregate((aggr, next) => next + "," + aggr)
+                    : "",
+                Data?.Length ?? -1);
         }
     }
 }

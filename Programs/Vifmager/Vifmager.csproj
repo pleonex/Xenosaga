@@ -35,15 +35,15 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Vif\VifPacketList.cs" />
-    <Compile Include="Vif\VifPacket.cs" />
-    <Compile Include="Vif\VifCommands.cs" />
-    <Compile Include="Vif\BinaryVifConverter.cs" />
-    <Compile Include="Gif\GifPacket.cs" />
-    <Compile Include="Gif\GifPacketKind.cs" />
-    <Compile Include="Gif\GifRegisters.cs" />
-    <Compile Include="Gif\GifPacketList.cs" />
-    <Compile Include="Gif\BinaryGifConverter.cs" />
+    <Compile Include="Vu\VifPacketList.cs" />
+    <Compile Include="Vu\VifPacket.cs" />
+    <Compile Include="Vu\VifCommands.cs" />
+    <Compile Include="Vu\BinaryVifConverter.cs" />
+    <Compile Include="Gs\GifPacket.cs" />
+    <Compile Include="Gs\GifPacketKind.cs" />
+    <Compile Include="Gs\GifRegisters.cs" />
+    <Compile Include="Gs\GifPacketList.cs" />
+    <Compile Include="Gs\BinaryGifConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">
@@ -52,8 +52,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Vif\" />
-    <Folder Include="Gif\" />
+    <Folder Include="Vu\" />
+    <Folder Include="Gs\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

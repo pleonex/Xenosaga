@@ -1,5 +1,5 @@
 ﻿//
-// GifPacket.cs
+// GifRegisters.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -23,35 +23,25 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace Vifmager.Gif
+namespace Vifmager.Gs
 {
-    using System.Linq;
-    using Libgame.IO;
-
-    public class GifPacket
+    public enum GifRegisters : byte
     {
-        public short Loops { get; set; }
-        public bool FinalPacket { get; set; }
-        public bool IgnorePrimField { get; set; }
-        public short Prim { get; set; }
-        public GifPacketKind Kind { get; set; }
-        public GifRegisters[] Registers { get; set; }
-
-        public DataStream Data { get; set; }
-
-        public override string ToString()
-        {
-            return string.Format(
-                "[GifPacket: NLOOP={0}, EOP={1}, PRE={2}, PRIM={3}, FLG={4}, REGS={5}, DATA={6}]",
-                Loops,
-                FinalPacket,
-                IgnorePrimField,
-                Prim,
-                Kind,
-                Kind != GifPacketKind.Image
-                    ? Registers.Select(reg => reg.ToString()).Aggregate((aggr, next) => next + "," + aggr)
-                    : "",
-                Data?.Length ?? -1);
-        }
+        Prim = 0x00,
+        RgbaQ = 0x01,
+        St = 0x02,
+        Uv = 0x03,
+        XyzF2 = 0x04,
+        Xyz2 = 0x05,
+        Tex0_1 = 0x06,
+        Tex0_2 = 0x07,
+        Clamp_1 = 0x08,
+        Clamp_2 = 0x09,
+        Fog = 0x0A,
+        Invalid = 0x0B,
+        XyzF3 = 0x0C,
+        Xyz3 = 0x0D,
+        APlusD = 0x0E,
+        Nop = 0x0F
     }
 }

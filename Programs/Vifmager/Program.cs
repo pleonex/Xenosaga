@@ -28,8 +28,8 @@ namespace Vifmager
     using System;
     using System.IO;
     using Libgame.IO;
-    using Gif;
-    using Vif;
+    using Gs;
+    using Vu;
 
     public class Program
     {

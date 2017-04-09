@@ -1,5 +1,5 @@
 ﻿//
-// GifTagFlags.cs
+// VifPacket.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -23,13 +23,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace Vifmager.Gif
+namespace Vifmager.Vu
 {
-    public enum GifPacketKind : byte
+    /// <summary>
+    /// Command and data for the VIF.
+    /// </summary>
+    public class VifPacket
     {
-        Packed = 0x00,
-        RegList = 0x01,
-        Image = 0x02,
-        Disable = 0x03
+        public VifCommands Command { get; set; }
+        public int Num { get; set; }
+        public int Immediate { get; set; }
+
+        public byte[] Data { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("[VifPacket: CMD={0}, NUM={1}, IMMEDIATE={2}, DATA={3}]",
+                                 Command,
+                                 Num,
+                                 Immediate,
+                                 Data?.Length ?? -1);
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿//
-// VifCode.cs
+// GifTagFlags.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -23,33 +23,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace Vifmager.Vif
+namespace Vifmager.Gs
 {
-    /// <summary>
-    /// Command for the VIF.
-    /// </summary>
-    public enum VifCommands : byte
+    public enum GifPacketKind : byte
     {
-        Nop = 0x00,
-        StCycl = 0x01,
-        Offset = 0x02,
-        Base = 0x03,
-        Itops = 0x04,
-        StMod = 0x05,
-        MskPath3 = 0x06,
-        Mark = 0x07,
-        FlushE = 0x10,
-        Flush = 0x11,
-        FlushA = 0x13,
-        MsCal = 0x14,
-        MsCnt = 0x17,
-        MsCalf = 0x15,
-        StMask = 0x20,
-        StRow = 0x30,
-        StCol = 0x31,
-        Mpg = 0x4A,
-        Direct = 0x50,
-        DirectHl = 0x51,
-        Unpack = 0x60
+        Packed = 0x00,
+        RegList = 0x01,
+        Image = 0x02,
+        Disable = 0x03
     }
 }
