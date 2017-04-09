@@ -67,6 +67,7 @@ namespace Vifmager
                     // Get the data to transfer to the GIF
                     DataStream gifStream = new DataStream();
                     WriteGifData(gifStream, rawNode.GetFormatAs<VifPacketList>());
+                    gifStream.Position = 0;
                     rawNode.Format = new BinaryFormat(gifStream);
 
                     // Read the GIF stream to get the image

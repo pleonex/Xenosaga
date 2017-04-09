@@ -25,14 +25,30 @@
 // THE SOFTWARE.
 namespace Vifmager.Gif
 {
+    using System.Linq;
+
     public class GifPacket
     {
         public short Loops { get; set; }
         public bool FinalPacket { get; set; }
         public bool IgnorePrimField { get; set; }
         public short Prim { get; set; }
+        public GifTagFlags Flags { get; set; }
         public GifRegisters[] Registers { get; set; }
 
         public byte[] Data { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "[GifPacket: NLOOP={0}, EOP={1}, PRE={2}, PRIM={3}, FLG={4}, REGS={5}, DATA={6}]",
+                Loops,
+                FinalPacket,
+                IgnorePrimField,
+                Prim,
+                Flags,
+                Registers.Select(reg => reg.ToString()).Aggregate((aggr, next) => next + "," + aggr),
+                Data?.Length ?? 0);
+        }
     }
 }

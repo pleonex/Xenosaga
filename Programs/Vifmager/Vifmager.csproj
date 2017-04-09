@@ -43,6 +43,7 @@
     <Compile Include="Gif\GifTagFlags.cs" />
     <Compile Include="Gif\GifRegisters.cs" />
     <Compile Include="Gif\GifPacketList.cs" />
+    <Compile Include="Gif\BinaryGifConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">
