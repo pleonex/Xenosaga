@@ -88,7 +88,7 @@ namespace Vifmager.Vu
                 break;
 
             default:
-                throw new FormatException("Unsupported command: " + packet.Command);
+                throw new NotSupportedException("Unsupported command: " + packet.Command);
             }
         }
     }

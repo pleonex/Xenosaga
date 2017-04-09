@@ -64,7 +64,9 @@ namespace Vifmager
             }
 
             // Finally get the image by processing the GIF commands
-            gifPackets.WriteImageData();
+            GsProcessor processor = new GsProcessor();
+            gifPackets.SendOperationsToGs(processor);
+            processor.Run();
         }
     }
 }
