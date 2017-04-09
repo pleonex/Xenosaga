@@ -27,88 +27,82 @@ namespace Vifmager.Gs
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using Operation = System.Tuple<byte, ulong>;
+    using Registers;
+    using Operation = System.Tuple<Registers.Addresses, ulong>;
 
     public class GsProcessor
     {
-        readonly IList<Operation> registerOperations;
+        const int MemorySize = 4 * 1024 * 1024; // 4 MB
+        readonly IList<Operation> operations;
 
         public GsProcessor()
         {
-            registerOperations = new List<Operation>();
+            operations = new List<Operation>();
+            Memory = new byte[MemorySize];
+            BitBlfBuf = new BitBlfBuf();
+            TrxPos = new TrxPos();
+            TrxReg = new TrxReg();
+            TrxDir = new TrxDir();
+            HwReg = new HwReg(this);
         }
 
-        public ReadOnlyCollection<Operation> Operations {
-            get { return new ReadOnlyCollection<Operation>(registerOperations); }
-        }
+        internal byte[] Memory { get; private set; }
 
-        public void Reset()
-        {
-            registerOperations.Clear();
-        }
+        internal BitBlfBuf BitBlfBuf { get; private set; }
+        internal TrxPos TrxPos { get; private set; }
+        internal TrxReg TrxReg { get; private set; }
+        internal TrxDir TrxDir { get; private set; }
+        internal HwReg HwReg { get; private set; }
 
         public void AddOperation(byte register, ulong data)
         {
-            registerOperations.Add(new Operation(register, data));
+            operations.Add(new Operation((Addresses)register, data));
         }
 
         public void Run()
         {
-            foreach (var operation in registerOperations)
-                ProcessRegister(operation.Item1, operation.Item2);
+            foreach (var operation in operations)
+                ProcessOperation(operation.Item1, operation.Item2);
+
+            PrintSnapshot();
         }
 
-        static void ProcessRegister(byte registerAddress, ulong data)
+        void PrintSnapshot()
         {
-            switch (registerAddress) {
-            case 0x00:
-                Console.WriteLine("[GS] IMAGE: {0:X16}", data);
+            Console.WriteLine("*** Graphic Synthesizer Snapshot ***");
+            Console.WriteLine(BitBlfBuf);
+            Console.WriteLine(TrxPos);
+            Console.WriteLine(TrxReg);
+            Console.WriteLine(TrxDir);
+            Console.WriteLine("*** ---------------------------- ***");
+        }
+
+        void ProcessOperation(Addresses register, ulong data)
+        {
+            switch (register) {
+            case Addresses.TexFlush:
+                Console.WriteLine("[GS] Flushing textures and disabling buffers");
+                PrintSnapshot();
                 break;
 
-            case 0x3F:
-                Console.WriteLine("[GS] TEXFLUSH: Waiting and enabling writting");
+            case Addresses.BitBlfBuf:
+                BitBlfBuf.Deserialize(data);
                 break;
 
-            case 0x50:
-                uint srcBufferPointer = (ushort)(data & 0x3FFF) * 64u;
-                int srcBufferWidth = (short)((data >> 16) & 0x3F) * 64;
-                byte srcPixelFormat = (byte)((data >> 24) & 0x3F);
-                uint dstBufferPointer = (ushort)((data >> 32) & 0x3FFF) * 64u;
-                int dstBufferWidth = (short)((data >> 48) & 0x3F) * 64;
-                byte dstPixelFormat = (byte)((data >> 56) & 0x3F);
-                Console.WriteLine("[GS] BITBLFBUF: SBP={0:X8}h,SBW={1},SPSM={2},DBP={3:X8}h,DBW={4},DPSM={5}",
-                                  srcBufferPointer,
-                                  srcBufferWidth,
-                                  srcPixelFormat,
-                                  dstBufferPointer,
-                                  dstBufferWidth,
-                                  dstPixelFormat);
+            case Addresses.TrxPos:
+                TrxPos.Deserialize(data);
                 break;
 
-            case 0x51:
-                ushort srcPosX = (ushort)(data & 0x7FF);
-                ushort srcPosY = (ushort)((data >> 16) & 0x7FF);
-                ushort dstPosX = (ushort)((data >> 32) & 0x7FF);
-                ushort dstPosY = (ushort)((data >> 48) & 0x7FF);
-                byte pixelDirection = (byte)((data >> 59) & 0x3);
-                Console.WriteLine("[GS] TRXPOS: SSAX={0},SSAY={1},DSAX={2},DSAY={3},DIR={4}",
-                                  srcPosX,
-                                  srcPosY,
-                                  dstPosX,
-                                  dstPosY,
-                                  pixelDirection);
+            case Addresses.TrxReg:
+                TrxReg.Deserialize(data);
                 break;
 
-            case 0x52:
-                ushort width = (ushort)(data & 0xFFF);
-                ushort height = (ushort)((data >> 32) & 0xFFF);
-                Console.WriteLine("[GS] TRXREG: RRW={0},RRH={1}", width, height);
+            case Addresses.TrxDir:
+                TrxDir.Deserialize(data);
                 break;
 
-            case 0x53:
-                byte transDirection = (byte)(data & 0x3);
-                Console.WriteLine("[GS] TRXDIR: XDIR={0}", transDirection);
+            case Addresses.HwReg:
+                HwReg.Send(data);
                 break;
 
             default:

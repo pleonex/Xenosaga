@@ -95,8 +95,8 @@ namespace Vifmager.Gs
         {
             DataReader reader = new DataReader(packet.Data);
             for (int i = 0; i < packet.Loops; i++) {
-                processor.AddOperation(0x00, reader.ReadUInt64());
-                processor.AddOperation(0x00, reader.ReadUInt64());
+                processor.AddOperation(0x54, reader.ReadUInt64());
+                processor.AddOperation(0x54, reader.ReadUInt64());
             }
         }
     }

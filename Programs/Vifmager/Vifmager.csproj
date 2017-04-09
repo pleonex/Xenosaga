@@ -45,6 +45,15 @@
     <Compile Include="Gs\GifPacketList.cs" />
     <Compile Include="Gs\BinaryGifConverter.cs" />
     <Compile Include="Gs\GsProcessor.cs" />
+    <Compile Include="Gs\Registers\BitBlfBuffer.cs" />
+    <Compile Include="Gs\Registers\Addresses.cs" />
+    <Compile Include="Gs\Registers\HwReg.cs" />
+    <Compile Include="Gs\Registers\TrxPos.cs" />
+    <Compile Include="Gs\Registers\TrxReg.cs" />
+    <Compile Include="Gs\Registers\TrxDir.cs" />
+    <Compile Include="Gs\Registers\PixelStorageFormat.cs" />
+    <Compile Include="Gs\Registers\PixelTransmissionOrder.cs" />
+    <Compile Include="Gs\Registers\TransmissionDirection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">
@@ -55,6 +64,7 @@
   <ItemGroup>
     <Folder Include="Vu\" />
     <Folder Include="Gs\" />
+    <Folder Include="Gs\Registers\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
