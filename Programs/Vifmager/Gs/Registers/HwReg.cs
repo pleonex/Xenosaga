@@ -38,13 +38,17 @@ namespace Vifmager.Gs.Registers
 
         public void Send(ulong data)
         {
-            Array.Copy(
-                BitConverter.GetBytes(data),
-                0,
-                processor.Memory,
-                processor.BitBlfBuf.DestinationBufferPointer,
-                8);
-            processor.BitBlfBuf.DestinationBufferPointer += 8;
+            if (processor.TrxDir.Direction == TransmissionDirection.Host2Local) {
+                Array.Copy(
+                    BitConverter.GetBytes(data),
+                    0,
+                    processor.Memory,
+                    processor.BitBlfBuf.DestinationBufferPointer,
+                    8);
+                processor.BitBlfBuf.DestinationBufferPointer += 8;
+            } else {
+                throw new NotSupportedException();
+            }
         }
     }
 }

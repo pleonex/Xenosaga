@@ -43,7 +43,7 @@ namespace Vifmager.Gs.Registers
 
         public override string ToString()
         {
-            return string.Format("[TrxReg: XDIR={0}]", Direction);
+            return string.Format("[TrxDir: XDIR={0}]", Direction);
         }
     }
 }
