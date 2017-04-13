@@ -90,6 +90,84 @@ namespace Vifmager.Gs
                 PrintSnapshot();
                 break;
 
+            case Addresses.Clamp_1:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Clamp_1");
+                break;
+
+            case Addresses.Clamp_2:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Clamp_2");
+                break;
+
+            case Addresses.Tex1_1:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Tex1_1");
+                break;
+
+            case Addresses.Tex1_2:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Tex1_2");
+                break;
+
+            case Addresses.Alpha_1:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Alpha_1");
+                break;
+
+            case Addresses.Alpha_2:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Alpha_2");
+                break;
+
+            case Addresses.Test_1:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Test_1");
+                break;
+
+            case Addresses.Test_2:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Test_2");
+                break;
+
+            case Addresses.Pabe:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Pabe");
+                break;
+
+            case Addresses.Fba_1:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Fba_1");
+                break;
+
+            case Addresses.Fba_2:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] Fba_2");
+                break;
+
+            case Addresses.ZBuf_1:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] ZBuf_1");
+                break;
+
+            case Addresses.ZBuf_2:
+                // TODO
+                if (Verbose)
+                    Console.WriteLine("[GS] ZBuf_2");
+                break;
+
             case Addresses.BitBlfBuf:
                 BitBlfBuf.Deserialize(data);
                 if (Verbose)
