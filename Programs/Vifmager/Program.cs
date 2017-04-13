@@ -33,6 +33,8 @@ namespace Vifmager
 
     public class Program
     {
+        static bool verbose;
+
         public static int Main(string[] args)
         {
             if (args.Length < 1) {
@@ -40,6 +42,7 @@ namespace Vifmager
                 return 1;
             }
 
+            verbose = args.Length > 1 && args[1] == "-v";
             ConvertToImage(args[0]);
 
             return 0;
@@ -65,6 +68,7 @@ namespace Vifmager
 
             // Finally get the image by processing the GIF commands
             GsProcessor processor = new GsProcessor();
+            processor.Verbose = verbose;
             gifPackets.SendOperationsToGs(processor);
             processor.Run();
         }

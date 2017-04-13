@@ -38,6 +38,8 @@ namespace Vifmager.Gs
         public GsProcessor()
         {
             operations = new List<Operation>();
+            Verbose = false;
+
             Memory = new byte[MemorySize];
             BitBlfBuf = new BitBlfBuf();
             TrxPos = new TrxPos();
@@ -45,6 +47,8 @@ namespace Vifmager.Gs
             TrxDir = new TrxDir();
             HwReg = new HwReg(this);
         }
+
+        public bool Verbose { get; set; }
 
         internal byte[] Memory { get; private set; }
 
@@ -81,32 +85,44 @@ namespace Vifmager.Gs
         {
             switch (register) {
             case Addresses.TexFlush:
-                Console.WriteLine("[GS] Flushing textures and disabling buffers");
+                if (Verbose)
+                    Console.WriteLine("[GS] Flushing textures and disabling buffers");
                 PrintSnapshot();
                 break;
 
             case Addresses.BitBlfBuf:
                 BitBlfBuf.Deserialize(data);
+                if (Verbose)
+                    Console.WriteLine("[GS] {0}", BitBlfBuf);
                 break;
 
             case Addresses.TrxPos:
                 TrxPos.Deserialize(data);
+                if (Verbose)
+                    Console.WriteLine("[GS] {0}", TrxPos);
                 break;
 
             case Addresses.TrxReg:
                 TrxReg.Deserialize(data);
+                if (Verbose)
+                    Console.WriteLine("[GS] {0}", TrxReg);
                 break;
 
             case Addresses.TrxDir:
                 TrxDir.Deserialize(data);
+                if (Verbose)
+                    Console.WriteLine("[GS] {0}", TrxDir);
                 break;
 
             case Addresses.HwReg:
                 HwReg.Send(data);
+                if (Verbose)
+                    Console.WriteLine("[GS] Sent data to HWREG at 0x{0:X8}",
+                                      BitBlfBuf.DestinationBufferPointer);
                 break;
 
             default:
-                throw new NotSupportedException("Unsupported register address");
+                throw new NotSupportedException("Unsupported register address: " + register);
             }
         }
     }
