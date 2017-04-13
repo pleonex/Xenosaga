@@ -59,6 +59,7 @@ namespace Vifmager.Vu
         {
             foreach (VifPacket pkt in Packets) {
                 switch (pkt.Command) {
+                case VifCommands.Direct:
                 case VifCommands.DirectHl:
                     gifStream.Write(pkt.Data, 0, pkt.Data.Length);
                     break;
@@ -71,7 +72,7 @@ namespace Vifmager.Vu
                     break;
 
                 default:
-                    throw new FormatException("Unsupported command");
+                    throw new FormatException("Unsupported command " + pkt.Command);
                 }
             }
         }
