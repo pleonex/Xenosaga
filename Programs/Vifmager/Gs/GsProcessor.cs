@@ -27,12 +27,14 @@ namespace Vifmager.Gs
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Registers;
     using Operation = System.Tuple<Registers.Addresses, ulong>;
 
     public class GsProcessor
     {
-        const int MemorySize = 4 * 1024 * 1024; // 4 MB
+        const int MemorySize = 1024 * 1024; // 4 MB (1 MB of 32-bits values)
+        const int PageBufferSize = 4 * 64 * 32; // More or less 4 pages?
         readonly IList<Operation> operations;
 
         public GsProcessor()
@@ -40,7 +42,9 @@ namespace Vifmager.Gs
             operations = new List<Operation>();
             Verbose = false;
 
-            Memory = new byte[MemorySize];
+            Memory = new uint[MemorySize];
+            PageBuffer = new List<uint>(PageBufferSize);
+            TexFlush = new TexFlush(this);
             BitBlfBuf = new BitBlfBuf();
             TrxPos = new TrxPos();
             TrxReg = new TrxReg();
@@ -50,8 +54,10 @@ namespace Vifmager.Gs
 
         public bool Verbose { get; set; }
 
-        internal byte[] Memory { get; private set; }
+        internal uint[] Memory { get; private set; }
+        internal IList<uint> PageBuffer { get; private set; }
 
+        internal TexFlush TexFlush { get; private set; }
         internal BitBlfBuf BitBlfBuf { get; private set; }
         internal TrxPos TrxPos { get; private set; }
         internal TrxReg TrxReg { get; private set; }
@@ -67,27 +73,33 @@ namespace Vifmager.Gs
         {
             foreach (var operation in operations)
                 ProcessOperation(operation.Item1, operation.Item2);
-
-            PrintSnapshot();
+            TexFlush.Flush();
         }
 
-        void PrintSnapshot()
+        internal void PrintSnapshot()
         {
+            if (System.IO.File.Exists("gsmemory.bin"))
+                System.IO.File.Delete("gsmemory.bin");
+
             Console.WriteLine("*** Graphic Synthesizer Snapshot ***");
             Console.WriteLine(BitBlfBuf);
             Console.WriteLine(TrxPos);
             Console.WriteLine(TrxReg);
             Console.WriteLine(TrxDir);
+            System.IO.File.WriteAllBytes(
+                "gsmemory.bin",
+                Memory.SelectMany(v => BitConverter.GetBytes(v)).ToArray());
             Console.WriteLine("*** ---------------------------- ***");
+            Console.ReadLine();
         }
 
         void ProcessOperation(Addresses register, ulong data)
         {
             switch (register) {
             case Addresses.TexFlush:
+                TexFlush.Flush();
                 if (Verbose)
-                    Console.WriteLine("[GS] Flushing textures and disabling buffers");
-                PrintSnapshot();
+                    Console.WriteLine("[GS] Flush textures and disabling buffers");
                 break;
 
             case Addresses.Clamp_1:

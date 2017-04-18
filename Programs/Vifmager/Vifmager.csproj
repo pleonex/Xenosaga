@@ -17,7 +17,8 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ExternalConsole>true</ExternalConsole>
+    <ExternalConsole>false</ExternalConsole>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -54,6 +55,8 @@
     <Compile Include="Gs\Registers\PixelStorageFormat.cs" />
     <Compile Include="Gs\Registers\PixelTransmissionOrder.cs" />
     <Compile Include="Gs\Registers\TransmissionDirection.cs" />
+    <Compile Include="Gs\Registers\TexFlush.cs" />
+    <Compile Include="Gs\GsTransfers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">

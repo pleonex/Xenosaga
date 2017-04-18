@@ -1,5 +1,5 @@
 ﻿//
-// HwReg.cs
+// TexFlush.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
@@ -25,25 +25,26 @@
 // THE SOFTWARE.
 namespace Vifmager.Gs.Registers
 {
-    using System;
+    using System.Linq;
 
-    public class HwReg
+    public class TexFlush
     {
         readonly GsProcessor proc;
 
-        public HwReg(GsProcessor processor)
+        public TexFlush(GsProcessor processor)
         {
             proc = processor;
         }
 
-        public void Send(ulong data)
+        public void Flush()
         {
-            if (proc.TrxDir.Direction == TransmissionDirection.Host2Local) {
-                proc.PageBuffer.Add((uint)(data & 0xFFFFFFFF));
-                proc.PageBuffer.Add((uint)(data >> 32));
-            } else {
-                throw new NotSupportedException();
+            // Copy page buffer to memory and clean buffer
+            if (proc.PageBuffer.Count() > 0) {
+                GsTransfers.TransferPsmCt32(proc, proc.PageBuffer.ToArray());
+                proc.PageBuffer.Clear();
             }
+
+            proc.PrintSnapshot();
         }
     }
 }
