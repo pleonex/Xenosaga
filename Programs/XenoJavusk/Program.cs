@@ -21,175 +21,62 @@
 namespace XenoJavusk
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Xml.Linq;
     using Libgame.IO;
+    using Libgame.FileFormat;
+    using Libgame.FileSystem;
 
     static class Program
     {
         public static void Main(string[] args)
         {
-            if (args.Length != 1)
+            if (args.Length != 2) {
+                Console.WriteLine("USAGE: [mono] XenoJavusk folderWithEvtFiles output");
                 return;
+            }
 
             string folder = args[0];
-            ProcessFolder(folder);
+            string output = args[1];
+            ProcessFolder(folder, output);
         }
 
-        static void ProcessFolder(string folder)
+        static void ProcessFolder(string folder, string output)
         {
-            foreach (var evtFile in Directory.GetFiles(folder, "*.evt")) {
-                var filename = Path.GetFileNameWithoutExtension(evtFile);
-                var baseFolder = Path.Combine(folder, filename);
-                using (var fileStream = new DataStream(evtFile, FileOpenMode.Read))
-                    ExtractFl00(fileStream, baseFolder);
+            EvtBinaryConverter converter = new EvtBinaryConverter();
+            foreach (var file in Directory.GetFiles(folder, "*.evt")) {
+                Node node = NodeFactory.FromFile(file);
+                node.Transform<NodeContainerFormat>(true, converter);
+                PrintTree(node, 0);
+                ExportTree(node, output);
             }
         }
 
-        static void ExtractFl00(DataStream fileStream, string baseFolder)
+        static void PrintTree(Node child, int level)
         {
-            if (!Directory.Exists(baseFolder))
-                Directory.CreateDirectory(baseFolder);
-
-            var reader = new DataReader(fileStream);
-
-            // Read header
-            var magicStamp = reader.ReadString(4);      // 'FL00' magic header
-            if (magicStamp != "FL00")
-                throw new FormatException("Invalid MagicStamp FL00");
-
-            reader.ReadUInt16();    // Minor version
-            reader.ReadUInt16();    // Major version
-            reader.ReadUInt32();    // File size
-            reader.ReadUInt32();    // Names offset
-            var unknown = reader.ReadUInt16();
-            if (unknown != 1)
-                throw new FormatException("Unknown from FL00");
-            var numFiles = reader.ReadUInt16();
-
-            // Read FAT and process files
-            for (int i = 0; i < numFiles; i++) {
-                // Read FAT
-                fileStream.Seek(0x14 + (i * 0x10), SeekMode.Start);
-                var nameOffset = reader.ReadUInt32();
-                var nameSize = reader.ReadInt32();
-                var fileOffset = reader.ReadUInt32();
-                var fileSize = reader.ReadUInt32();
-
-                // Read filename
-                fileStream.Seek(nameOffset, SeekMode.Start);
-                var filename = reader.ReadString(nameSize);
-
-                // Process file
-                var outputFile = Path.Combine(baseFolder, filename);
-                using (var javaClassStream = new DataStream(fileStream, fileOffset, fileSize))
-                    ExtractJavaConstant(javaClassStream, outputFile);
+            string indent = new string(' ', level * 2);
+            if (child.IsContainer) {
+                Console.WriteLine("{0}+ {1}", indent, child.Name);
+                foreach (Node subchild in child.Children)
+                    PrintTree(subchild, level + 1);
+            } else {
+                DataStream stream = child.GetFormatAs<BinaryFormat>()?.Stream;
+                Console.WriteLine("{0}+ {1}: {2}", indent, child.Name, stream?.Length ?? -1);
             }
         }
 
-        static void ExtractJavaConstant(DataStream classStream, string outputFile)
+        static void ExportTree(Node node, string output)
         {
-            classStream.WriteTo(outputFile);
-            var reader = new DataReader(classStream) {
-                Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = Encoding.UTF8
-            };
+            output = Path.Combine(output, node.Name);
+            if (node.IsContainer) {
+                if (!Directory.Exists(output))
+                    Directory.CreateDirectory(output);
 
-            // Read header
-            var magicStamp = reader.ReadUInt32();
-            if (magicStamp != 0xCAFEBABE)
-                throw new FormatException("Invalid MagicStamp CAFEBABE");
-            reader.ReadUInt16();    // Minor version
-            reader.ReadUInt16();    // Major version
-
-            // Read the constant pool
-            var utf8Constants = new Dictionary<int, string>();
-            var stringsIdx = new List<int>();
-            var constantPoolCount = reader.ReadUInt16();
-            for (int i = 0; i < constantPoolCount - 1; i++) {
-                ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
-                if (tag == ConstantPoolTag.Utf8) {
-                    var text = reader.ReadString(reader.ReadUInt16());
-                    utf8Constants.Add(i, text);
-                } else if (tag == ConstantPoolTag.String) {
-                    stringsIdx.Add(reader.ReadUInt16() - 1);
-                } else {
-                    reader.ReadBytes(GetConstantPoolItemInfoLength(tag));
-                }
+                foreach (var child in node.Children)
+                    ExportTree(child, output);
+            } else {
+                DataStream stream = node.GetFormatAs<BinaryFormat>()?.Stream;
+                stream?.WriteTo(output);
             }
-
-            var stringLiterals = utf8Constants.Where(item => stringsIdx.Contains(item.Key));
-            if (!stringLiterals.Any())
-                return;
-
-            var xml = new XDocument();
-            xml.Add(new XElement("JavaClass"));
-            xml.Declaration = new XDeclaration("1.0", "utf-8", "yes");
-
-            var constantRoot = new XElement("StringConstants");
-            xml.Root.Add(constantRoot);
-            foreach (var constantString in stringLiterals) {
-                var xmlString = new XElement("StringConstant");
-                xmlString.SetAttributeValue("index", constantString.Key);
-                xmlString.Value = constantString.Value;
-                constantRoot.Add(xmlString);
-            }
-
-            xml.Save(outputFile + ".xml");
-        }
-
-        static int GetConstantPoolItemInfoLength(ConstantPoolTag tag)
-        {
-            switch (tag) {
-            case ConstantPoolTag.Class:
-                return 2;
-            case ConstantPoolTag.FieldRef:
-                return 4;
-            case ConstantPoolTag.MethodRef:
-                return 4;
-            case ConstantPoolTag.InterfaceMethodRef:
-                return 4;
-            case ConstantPoolTag.String:
-                return 2;
-            case ConstantPoolTag.Integer:
-                return 4;
-            case ConstantPoolTag.Float:
-                return 4;
-            case ConstantPoolTag.Long:
-                return 8;
-            case ConstantPoolTag.Double:
-                return 8;
-            case ConstantPoolTag.NameAndType:
-                return 4;
-            case ConstantPoolTag.MethodHandle:
-                return 3;
-            case ConstantPoolTag.MethodType:
-                return 2;
-            case ConstantPoolTag.InvokeDynamic:
-                return 4;
-            default:
-                throw new FormatException("Unknown tag");
-            }
-        }
-
-        enum ConstantPoolTag : byte {
-            Utf8 = 1,
-            Integer = 3,
-            Float = 4,
-            Long = 5,
-            Double = 6,
-            Class = 7,
-            String = 8,
-            FieldRef = 9,
-            MethodRef = 10,
-            InterfaceMethodRef = 11,
-            NameAndType = 12,
-            MethodHandle = 15,
-            MethodType = 16,
-            InvokeDynamic = 18
         }
     }
 }
