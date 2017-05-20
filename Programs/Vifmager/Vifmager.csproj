@@ -57,6 +57,7 @@
     <Compile Include="Gs\Registers\TransmissionDirection.cs" />
     <Compile Include="Gs\Registers\TexFlush.cs" />
     <Compile Include="Gs\GsTransfers.cs" />
+    <Compile Include="Gs\Registers\Tex0.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">

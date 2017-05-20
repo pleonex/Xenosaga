@@ -44,6 +44,9 @@ namespace Vifmager.Gs
 
             Memory = new uint[MemorySize];
             PageBuffer = new List<uint>(PageBufferSize);
+
+            Tex0_1 = new Tex0(1);
+            Tex0_2 = new Tex0(2);
             TexFlush = new TexFlush(this);
             BitBlfBuf = new BitBlfBuf();
             TrxPos = new TrxPos();
@@ -57,6 +60,8 @@ namespace Vifmager.Gs
         internal uint[] Memory { get; private set; }
         internal IList<uint> PageBuffer { get; private set; }
 
+        internal Tex0 Tex0_1 { get; private set; }
+        internal Tex0 Tex0_2 { get; private set; }
         internal TexFlush TexFlush { get; private set; }
         internal BitBlfBuf BitBlfBuf { get; private set; }
         internal TrxPos TrxPos { get; private set; }
