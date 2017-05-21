@@ -29,7 +29,9 @@ namespace XenoJavusk
     using Libgame.IO;
     using Libgame.FileFormat;
     using Libgame.FileSystem;
+    using Mono.Addins;
 
+    [Extension]
     public class EvtBinaryConverter : IConverter<BinaryFormat, NodeContainerFormat>
     {
         public NodeContainerFormat Convert(BinaryFormat source)
@@ -59,10 +61,9 @@ namespace XenoJavusk
             var subfiles = reader.ReadInt16();
 
             // Read path
-            long currPos = reader.Stream.Position;
-            reader.Stream.Seek(nameOffset, SeekMode.Start);
+            reader.Stream.PushToPosition(nameOffset, SeekMode.Start);
             var path = reader.ReadString(nameSize);
-            reader.Stream.Position = currPos;
+            reader.Stream.PopPosition();
 
             for (int i = 0; i < subfiles; i++)
                 NodeFactory.CreateContainersForChild(root, path, ReadChild(reader));
@@ -77,10 +78,9 @@ namespace XenoJavusk
             var fileSize = reader.ReadUInt32();
 
             // Read filename
-            long currPos = reader.Stream.Position;
-            reader.Stream.Seek(nameOffset, SeekMode.Start);
+            reader.Stream.PushToPosition(nameOffset, SeekMode.Start);
             var filename = reader.ReadString(nameSize);
-            reader.Stream.Position = currPos;
+            reader.Stream.PopPosition();
 
             DataStream stream = new DataStream(reader.Stream, fileOffset, fileSize);
             return new Node(filename, new BinaryFormat(stream));

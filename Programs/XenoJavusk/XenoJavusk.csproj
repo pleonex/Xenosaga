@@ -33,12 +33,16 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Mono.Addins">
+      <HintPath>..\libgame\libgame\bin\Debug\Mono.Addins.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EvtBinaryConverter.cs" />
     <Compile Include="JavaClassBinaryConverter.cs" />
+    <Compile Include="XmlExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">

@@ -22,6 +22,7 @@ namespace XenoJavusk
 {
     using System;
     using System.IO;
+    using System.Xml.Linq;
     using Libgame.IO;
     using Libgame.FileFormat;
     using Libgame.FileSystem;
@@ -30,24 +31,31 @@ namespace XenoJavusk
     {
         public static void Main(string[] args)
         {
-            if (args.Length != 2) {
-                Console.WriteLine("USAGE: [mono] XenoJavusk folderWithEvtFiles output");
+            if (args.Length != 2 && args.Length != 3) {
+                Console.WriteLine("USAGE: [mono] XenoJavusk folderWithEvtFiles output [saveClasses=0]");
                 return;
             }
 
             string folder = args[0];
             string output = args[1];
-            ProcessFolder(folder, output);
+            bool saveClasses = args.Length == 3 && args[2] == "1";
+            ProcessFolder(folder, output, saveClasses);
         }
 
-        static void ProcessFolder(string folder, string output)
+        static void ProcessFolder(string folder, string output, bool saveClasses)
         {
             EvtBinaryConverter converter = new EvtBinaryConverter();
             foreach (var file in Directory.GetFiles(folder, "*.evt")) {
                 Node node = NodeFactory.FromFile(file);
                 node.Transform<NodeContainerFormat>(true, converter);
+
                 PrintTree(node, 0);
-                ExportTree(node, output);
+
+                if (saveClasses)
+                    SaveTreeIntoFiles(node, output);
+
+                string outPath = Path.Combine(output, node.Name.Replace(".evt", ".xml"));
+                ExportEvtChildrenIntoXml(node).Save(outPath);
             }
         }
 
@@ -64,7 +72,7 @@ namespace XenoJavusk
             }
         }
 
-        static void ExportTree(Node node, string output)
+        static void SaveTreeIntoFiles(Node node, string output)
         {
             output = Path.Combine(output, node.Name);
             if (node.IsContainer) {
@@ -72,11 +80,30 @@ namespace XenoJavusk
                     Directory.CreateDirectory(output);
 
                 foreach (var child in node.Children)
-                    ExportTree(child, output);
+                    SaveTreeIntoFiles(child, output);
             } else {
                 DataStream stream = node.GetFormatAs<BinaryFormat>()?.Stream;
                 stream?.WriteTo(output);
             }
+        }
+
+        static XDocument ExportEvtChildrenIntoXml(Node node)
+        {
+            XDocument xml = new XDocument(new XDeclaration("1.0", "utf-8", "true"));
+            XElement root = new XElement("evt");
+            root.SetAttributeValue("filename", node.Name);
+
+            foreach (Node child in Navigator.IterateNodes(node)) {
+                if (child.IsContainer)
+                    continue;
+
+                XElement javaClass = child.Format.ConvertTo<XElement>();
+                javaClass.SetAttributeValue("class", child.Path.Substring(node.Name.Length + 2));
+                root.Add(javaClass);
+            }
+
+            xml.Add(root);
+            return xml;
         }
     }
 }

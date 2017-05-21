@@ -20,8 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Mono.Addins;
 
 [assembly: AssemblyTitle("XenoJavusk")]
 [assembly: AssemblyDescription("")]
@@ -34,3 +34,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.*")]
 [assembly: CLSCompliant(true)]
 [assembly: ComVisibleAttribute(true)]
+[assembly: Addin("XenoJavusk", "1.0")]
+[assembly: AddinDependency("libgame", "1.0")]

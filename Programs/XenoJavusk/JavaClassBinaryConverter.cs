@@ -27,15 +27,16 @@ namespace XenoJavusk
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
     using System.Xml.Linq;
     using Libgame.IO;
     using Libgame.FileFormat;
+    using Mono.Addins;
 
-    public class JavaClassBinaryConverter : IConverter<BinaryFormat, XDocument>
+    [Extension]
+    public class JavaClassBinaryConverter : IConverter<BinaryFormat, XElement>
     {
-        public XDocument Convert(BinaryFormat source)
+        public XElement Convert(BinaryFormat source)
         {
             DataReader reader = new DataReader(source.Stream) {
                 Endianness = EndiannessMode.BigEndian,
@@ -50,14 +51,14 @@ namespace XenoJavusk
             reader.ReadUInt16();    // Major version
 
             // Read the constant pool
-            var utf8Constants = new Dictionary<int, string>();
+            var textConstants = new Dictionary<int, string>();
             var stringsIdx = new List<int>();
             var constantPoolCount = reader.ReadUInt16();
             for (int i = 0; i < constantPoolCount - 1; i++) {
                 ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
                 if (tag == ConstantPoolTag.Utf8) {
                     var text = reader.ReadString(reader.ReadUInt16());
-                    utf8Constants.Add(i, text);
+                    textConstants.Add(i, text);
                 } else if (tag == ConstantPoolTag.String) {
                     stringsIdx.Add(reader.ReadUInt16() - 1);
                 } else {
@@ -65,19 +66,13 @@ namespace XenoJavusk
                 }
             }
 
-            XDocument xml = new XDocument();
-            xml.Add(new XElement("JavaClass"));
-            xml.Declaration = new XDeclaration("1.0", "utf-8", "yes");
-
-            var constantRoot = new XElement("StringConstants");
-            xml.Root.Add(constantRoot);
-
-            var stringLiterals = utf8Constants.Where(item => stringsIdx.Contains(item.Key));
-            foreach (var constantString in stringLiterals) {
+            // Generate the XML element
+            var xml = new XElement("StringConstants");
+            foreach (var index in stringsIdx) {
                 var xmlString = new XElement("StringConstant");
-                xmlString.SetAttributeValue("index", constantString.Key);
-                xmlString.Value = constantString.Value;
-                constantRoot.Add(xmlString);
+                xmlString.SetAttributeValue("index", index);
+                xmlString.SetIndentedValue(textConstants[index].Replace("\0", ""), 3);
+                xml.Add(xmlString);
             }
 
             return xml;
