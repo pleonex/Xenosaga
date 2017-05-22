@@ -83,9 +83,7 @@ namespace XenoJavusk
 
             uint fileSectionStart = 0x0C + 8u * numFolders + 16u * numFiles;
             uint namesSectionStart = fileSectionStart + (uint)filesStream.Length;
-            uint padding = 0x10 - (namesSectionStart % 0x10);
-            if (padding != 0x10)
-                namesSectionStart += padding;
+            namesSectionStart = namesSectionStart.Pad(16);
 
             // Create the table at the same we generate the names section
             DataStream namesStream = new DataStream();
@@ -103,10 +101,7 @@ namespace XenoJavusk
                     uint streamLength = (uint)(node.GetFormatAs<BinaryFormat>()?.Stream.Length ?? 0);
                     writer.Write(currentFileOffset);
                     writer.Write(streamLength);
-                    currentFileOffset += streamLength;
-                    padding = 4 - (currentFileOffset % 4);
-                    if (padding != 4)
-                        currentFileOffset += padding;
+                    currentFileOffset = (currentFileOffset + streamLength).Pad(4);
                 }
             }
 
