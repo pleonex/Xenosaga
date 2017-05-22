@@ -32,7 +32,8 @@ namespace XenoJavusk
     using Mono.Addins;
 
     [Extension]
-    public class EvtBinaryConverter : IConverter<BinaryFormat, NodeContainerFormat>
+    public class EvtBinaryConverter : IConverter<BinaryFormat, NodeContainerFormat>,
+            IConverter<NodeContainerFormat, BinaryFormat>
     {
         public NodeContainerFormat Convert(BinaryFormat source)
         {
@@ -52,6 +53,75 @@ namespace XenoJavusk
                 ReadFolder(container.Root, reader);
 
             return container;
+        }
+
+        public BinaryFormat Convert(NodeContainerFormat source)
+        {
+            DataStream stream = new DataStream();
+            DataWriter writer = new DataWriter(stream);
+
+            writer.Write("FL00", false);
+            writer.Write((ushort)0x00);
+            writer.Write((ushort)0x00);  // Num folder, we'll write it later
+            writer.Write(0x00);  // File size, written later
+
+            // Write first the files and gets the number of them so we can predict
+            // the names offset
+            DataStream filesStream = new DataStream();
+            DataWriter filesWriter = new DataWriter(filesStream);
+            ushort numFolders = 0;
+            ushort numFiles = 0;
+            foreach (Node node in Navigator.IterateNodes(source.Root)) {
+                if (node.IsContainer) {
+                    numFolders++;
+                } else {
+                    numFiles++;
+                    node.GetFormatAs<BinaryFormat>()?.Stream.WriteTo(filesStream);
+                    filesWriter.WritePadding(0x00, 4);
+                }
+            }
+
+            uint fileSectionStart = 0x0C + 8u * numFolders + 16u * numFiles;
+            uint namesSectionStart = fileSectionStart + (uint)filesStream.Length;
+            uint padding = 0x10 - (namesSectionStart % 0x10);
+            if (padding != 0x10)
+                namesSectionStart += padding;
+
+            // Create the table at the same we generate the names section
+            DataStream namesStream = new DataStream();
+            DataWriter nameWriter = new DataWriter(namesStream);
+            uint currentFileOffset = fileSectionStart;
+            foreach (Node node in Navigator.IterateNodes(source.Root)) {
+                string path = node.Path.Substring(node.Parent.Path.Length + 1);
+
+                writer.Write((uint)(namesSectionStart + namesStream.Length));
+                writer.Write((ushort)path.Length);  // assuming ASCII only
+                writer.Write((ushort)node.Children.Count);
+                nameWriter.Write(path);
+
+                if (!node.IsContainer) {
+                    uint streamLength = (uint)(node.GetFormatAs<BinaryFormat>()?.Stream.Length ?? 0);
+                    writer.Write(currentFileOffset);
+                    writer.Write(streamLength);
+                    currentFileOffset += streamLength;
+                    padding = 4 - (currentFileOffset % 4);
+                    if (padding != 4)
+                        currentFileOffset += padding;
+                }
+            }
+
+            // Append other streams
+            filesStream.WriteTo(stream);
+            filesStream.Dispose();
+            namesStream.WriteTo(stream);
+            namesStream.Dispose();
+
+            // Now we can write the missing fields in the header
+            stream.Position = 0x6;
+            writer.Write(numFolders);
+            writer.Write((uint)stream.Length);
+
+            return new BinaryFormat(stream);
         }
 
         void ReadFolder(Node root, DataReader reader)

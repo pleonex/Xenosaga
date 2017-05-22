@@ -34,13 +34,16 @@ namespace XenoJavusk
     using Mono.Addins;
 
     [Extension]
-    public class JavaClassBinaryConverter : IConverter<BinaryFormat, XElement>
+    public class JavaClassBinaryConverter : IConverter<BinaryFormat, XElement>,
+            IConverter<XElement, BinaryFormat>
     {
+        public DataStream OriginalStream { get; set; }
+
         public XElement Convert(BinaryFormat source)
         {
             DataReader reader = new DataReader(source.Stream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = Encoding.UTF8
+                DefaultEncoding = new UTF8Encoding(false, true)
             };
 
             // Read header
@@ -57,8 +60,10 @@ namespace XenoJavusk
             for (int i = 0; i < constantPoolCount - 1; i++) {
                 ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
                 if (tag == ConstantPoolTag.Utf8) {
-                    var text = reader.ReadString(reader.ReadUInt16());
-                    textConstants.Add(i, text);
+                    try {
+                        textConstants.Add(i, reader.ReadString(typeof(ushort)));
+                    } catch (DecoderFallbackException) {
+                    }
                 } else if (tag == ConstantPoolTag.String) {
                     stringsIdx.Add(reader.ReadUInt16() - 1);
                 } else {
@@ -69,6 +74,10 @@ namespace XenoJavusk
             // Generate the XML element
             var xml = new XElement("StringConstants");
             foreach (var index in stringsIdx) {
+                // We are skipping some text with encoding issues
+                if (!textConstants.ContainsKey(index))
+                    continue;
+
                 var xmlString = new XElement("StringConstant");
                 xmlString.SetAttributeValue("index", index);
                 xmlString.SetIndentedValue(textConstants[index].Replace("\0", ""), 3);
@@ -76,6 +85,62 @@ namespace XenoJavusk
             }
 
             return xml;
+        }
+
+        public BinaryFormat Convert(XElement source)
+        {
+            if (OriginalStream == null)
+                throw new InvalidOperationException("Cannot convert from XML without original stream");
+
+            // Get the list of strings to change
+            Dictionary<int, string> textConstants = new Dictionary<int, string>();
+            foreach (var element in source.Elements("StringConstant")) {
+                int index = Int32.Parse(element.Attribute("index").Value);
+                textConstants[index] = element.GetIndentedValue();
+            }
+
+            OriginalStream.Position = 0;
+            DataReader reader = new DataReader(OriginalStream) {
+                Endianness = EndiannessMode.BigEndian,
+                DefaultEncoding = new UTF8Encoding(false, true)
+            };
+
+            DataStream stream = new DataStream();
+            DataWriter writer = new DataWriter(stream) {
+                Endianness = EndiannessMode.BigEndian,
+                DefaultEncoding = new UTF8Encoding(false, true)
+            };
+
+            // Magic stamp + Version
+            writer.Write(reader.ReadBytes(8));
+
+            // Read pool and write into new stream changing texts
+            ushort poolCount = reader.ReadUInt16();
+            writer.Write(poolCount);
+            for (int i = 0; i < poolCount - 1; i++) {
+                ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
+                writer.Write((byte)tag);
+
+                if (tag == ConstantPoolTag.Utf8) {
+                    var textData = reader.ReadBytes(reader.ReadUInt16());
+                    if (textConstants.ContainsKey(i))
+                        writer.Write(textConstants[i], typeof(ushort), true);
+                    else {
+                        writer.Write((ushort)textData.Length);
+                        writer.Write(textData);
+                    }
+                } else {
+                    writer.Write(reader.ReadBytes(GetConstantPoolItemInfoLength(tag)));
+                }
+            }
+
+            // Write the rest of the file without changes
+            writer.Write(reader.ReadBytes((int)(OriginalStream.Length - OriginalStream.Position)));
+
+            // Clean to prevent errors
+            OriginalStream = null;
+
+            return new BinaryFormat(stream);
         }
 
         static int GetConstantPoolItemInfoLength(ConstantPoolTag tag)

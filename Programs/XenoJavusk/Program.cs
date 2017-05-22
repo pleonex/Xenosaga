@@ -31,18 +31,33 @@ namespace XenoJavusk
     {
         public static void Main(string[] args)
         {
-            if (args.Length != 2 && args.Length != 3) {
-                Console.WriteLine("USAGE: [mono] XenoJavusk folderWithEvtFiles output [saveClasses=0]");
+            if (args.Length != 4) {
+                ShowHelp();
                 return;
             }
 
-            string folder = args[0];
-            string output = args[1];
-            bool saveClasses = args.Length == 3 && args[2] == "1";
-            ProcessFolder(folder, output, saveClasses);
+            string mode = args[0];
+            string evtFolder = args[1];
+            string outFolder = args[2];
+
+            if (mode == "-e") {
+                bool saveClasses = args[3] == "1";
+                ExportFolder(evtFolder, outFolder, saveClasses);
+            } else if (mode == "-i") {
+                string xmlFolder = args[3];
+                ImportFolder(xmlFolder, evtFolder, outFolder);
+            } else {
+                ShowHelp();
+            }
         }
 
-        static void ProcessFolder(string folder, string output, bool saveClasses)
+        static void ShowHelp()
+        {
+            Console.Write("USAGE: [mono] XenoJavusk (-e|-i) evtFolder outFolder ");
+            Console.WriteLine("saveClasses|xmlFolder)");
+        }
+
+        static void ExportFolder(string folder, string output, bool saveClasses)
         {
             EvtBinaryConverter converter = new EvtBinaryConverter();
             foreach (var file in Directory.GetFiles(folder, "*.evt")) {
@@ -56,6 +71,33 @@ namespace XenoJavusk
 
                 string outPath = Path.Combine(output, node.Name.Replace(".evt", ".xml"));
                 ExportEvtChildrenIntoXml(node).Save(outPath);
+            }
+        }
+
+        static void ImportFolder(string xmlFolder, string evtFolder, string outFolder)
+        {
+            EvtBinaryConverter converter = new EvtBinaryConverter();
+            foreach (var file in Directory.GetFiles(xmlFolder, "*.xml")) {
+                string filename = Path.GetFileNameWithoutExtension(file);
+
+                // Validate that there is an original EVT file per XML
+                string evtFile = Path.Combine(evtFolder, filename + ".evt");
+                if (!File.Exists(evtFile))
+                    continue;
+
+                // Read the EVT to get the subfiles / java classes
+                Node evt = NodeFactory.FromFile(evtFile);
+                evt.Transform<NodeContainerFormat>(true, converter);
+                PrintTree(evt, 0);
+
+                // Import the java classes from the xml
+                XDocument xml = XDocument.Load(file);
+                ImportEvtChildrenFromXml(evt, xml);
+
+                // Write the evt back
+                string outFile = Path.Combine(outFolder, filename + ".evt");
+                evt.Transform<BinaryFormat>(true, converter);
+                evt.GetFormatAs<BinaryFormat>().Stream.WriteTo(outFile);
             }
         }
 
@@ -104,6 +146,24 @@ namespace XenoJavusk
 
             xml.Add(root);
             return xml;
+        }
+
+        static void ImportEvtChildrenFromXml(Node node, XDocument xml)
+        {
+            JavaClassBinaryConverter javaConverter = new JavaClassBinaryConverter();
+            foreach (XElement xmlClass in xml.Root.Elements()) {
+                string path = xmlClass.Attribute("class").Value;
+                path = node.Path + NodeSystem.PathSeparator + path;
+                Node child = Navigator.SearchFile(node, path);
+                if (child == null) {
+                    throw new Exception();
+                }
+
+                DataStream originalStream = child.GetFormatAs<BinaryFormat>()?.Stream;
+                javaConverter.OriginalStream = originalStream;
+                child.Format = javaConverter.Convert(xmlClass);
+                originalStream.Dispose();
+            }
         }
     }
 }

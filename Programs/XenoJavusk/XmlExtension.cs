@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 namespace XenoJavusk
 {
+    using System.Text;
     using System.Xml.Linq;
 
     static class XmlExtension
@@ -34,6 +35,26 @@ namespace XenoJavusk
         public static void SetIndentedValue(this XElement entry, string val, int indent)
         {
             entry.Value = IndentString(val, indent);
+        }
+
+        public static string GetIndentedValue(this XElement entry)
+        {
+            StringBuilder str = new StringBuilder(entry.Value);
+
+            // Remove indentation
+            str.Replace("\r", "");
+            str.Replace("\t", " "); // Don't change for 4 spaces, extra spaces are removed
+            RemoveDuplicatedSpaces(str);
+
+            // Remove new line indentation
+            str.Replace("\n ", "\n");       // Remove spaces after
+            str.Replace(" \n", "\n");       // and before new line
+            if (str.Length > 0 && str[0] == '\n')             // Remove first new line char
+                str.Remove(0, 1);
+            if (str.Length > 0 && str[str.Length - 1] == '\n') // Remove last new line char
+                str.Remove(str.Length - 1, 1);
+
+            return str.ToString();
         }
 
         static string IndentString(string val, int indent)
@@ -49,6 +70,14 @@ namespace XenoJavusk
 
             return "\n" + indentation + val.Replace("\n", "\n" + indentation) +
                     "\n" + indentationEnd;
+        }
+
+        static void RemoveDuplicatedSpaces(StringBuilder str)
+        {
+            for (int i = str.Length - 1; i > 0; i--) {
+                if (str[i] == ' ' && str[i - 1] == ' ')
+                    str.Remove(i, 1);
+            }
         }
     }
 }
