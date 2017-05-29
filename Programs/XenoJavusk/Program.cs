@@ -91,7 +91,7 @@ namespace XenoJavusk
                 PrintTree(evt, 0);
 
                 // Import the java classes from the xml
-                XDocument xml = XDocument.Load(file);
+                XDocument xml = XDocument.Load(file, LoadOptions.PreserveWhitespace);
                 ImportEvtChildrenFromXml(evt, xml);
 
                 // Write the evt back
@@ -159,10 +159,12 @@ namespace XenoJavusk
                     throw new Exception();
                 }
 
-                DataStream originalStream = child.GetFormatAs<BinaryFormat>()?.Stream;
+                // We need to convert from Binary to Binary (skip XML conversion)
+                BinaryFormat originalFormat = child.GetFormatAs<BinaryFormat>();
+                DataStream originalStream = originalFormat.Stream;
                 javaConverter.OriginalStream = originalStream;
                 child.Format = javaConverter.Convert(xmlClass);
-                originalStream.Dispose();
+                originalFormat.Dispose();
             }
         }
     }

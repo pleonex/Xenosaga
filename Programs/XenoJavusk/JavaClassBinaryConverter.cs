@@ -124,7 +124,7 @@ namespace XenoJavusk
                 if (tag == ConstantPoolTag.Utf8) {
                     var textData = reader.ReadBytes(reader.ReadUInt16());
                     if (textConstants.ContainsKey(i))
-                        writer.Write(textConstants[i], typeof(ushort), true);
+                        writer.Write(textConstants[i], typeof(ushort), textConstants[i].Length > 0);
                     else {
                         writer.Write((ushort)textData.Length);
                         writer.Write(textData);

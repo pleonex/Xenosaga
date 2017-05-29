@@ -83,7 +83,6 @@ namespace XenoJavusk
 
             uint fileSectionStart = 0x0C + 8u * numFolders + 16u * numFiles;
             uint namesSectionStart = fileSectionStart + (uint)filesStream.Length;
-            namesSectionStart = namesSectionStart.Pad(16);
 
             // Create the table at the same we generate the names section
             DataStream namesStream = new DataStream();
