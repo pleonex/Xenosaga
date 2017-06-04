@@ -105,8 +105,8 @@ namespace XenoJavusk
                 DefaultEncoding = new UTF8Encoding(false, true)
             };
 
-            DataStream stream = new DataStream();
-            DataWriter writer = new DataWriter(stream) {
+            BinaryFormat format = new BinaryFormat();
+            DataWriter writer = new DataWriter(format.Stream) {
                 Endianness = EndiannessMode.BigEndian,
                 DefaultEncoding = new UTF8Encoding(false, true)
             };
@@ -140,7 +140,7 @@ namespace XenoJavusk
             // Clean to prevent errors
             OriginalStream = null;
 
-            return new BinaryFormat(stream);
+            return format;
         }
 
         static int GetConstantPoolItemInfoLength(ConstantPoolTag tag)

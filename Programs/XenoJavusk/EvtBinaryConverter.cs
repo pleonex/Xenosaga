@@ -57,8 +57,8 @@ namespace XenoJavusk
 
         public BinaryFormat Convert(NodeContainerFormat source)
         {
-            DataStream stream = new DataStream();
-            DataWriter writer = new DataWriter(stream);
+            BinaryFormat format = new BinaryFormat();
+            DataWriter writer = new DataWriter(format.Stream);
 
             writer.Write("FL00", false);
             writer.Write((ushort)0x00);
@@ -105,17 +105,17 @@ namespace XenoJavusk
             }
 
             // Append other streams
-            filesStream.WriteTo(stream);
+            filesStream.WriteTo(format.Stream);
             filesStream.Dispose();
-            namesStream.WriteTo(stream);
+            namesStream.WriteTo(format.Stream);
             namesStream.Dispose();
 
             // Now we can write the missing fields in the header
-            stream.Position = 0x6;
+            format.Stream.Position = 0x6;
             writer.Write(numFolders);
-            writer.Write((uint)stream.Length);
+            writer.Write((uint)format.Stream.Length);
 
-            return new BinaryFormat(stream);
+            return format;
         }
 
         void ReadFolder(Node root, DataReader reader)
@@ -146,8 +146,7 @@ namespace XenoJavusk
             var filename = reader.ReadString(nameSize);
             reader.Stream.PopPosition();
 
-            DataStream stream = new DataStream(reader.Stream, fileOffset, fileSize);
-            return new Node(filename, new BinaryFormat(stream));
+            return new Node(filename, new BinaryFormat(reader.Stream, fileOffset, fileSize));
         }
     }
 }
