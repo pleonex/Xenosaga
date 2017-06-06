@@ -27,7 +27,6 @@ namespace XenoJavusk
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
     using System.Xml.Linq;
     using Libgame.IO;
     using Libgame.FileFormat;
@@ -43,7 +42,7 @@ namespace XenoJavusk
         {
             DataReader reader = new DataReader(source.Stream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new UTF8Encoding(false, true)
+                DefaultEncoding = new EscapeOutRangeEnconding("ascii")
             };
 
             // Read header
@@ -60,10 +59,7 @@ namespace XenoJavusk
             for (int i = 0; i < constantPoolCount - 1; i++) {
                 ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
                 if (tag == ConstantPoolTag.Utf8) {
-                    try {
-                        textConstants.Add(i, reader.ReadString(typeof(ushort)));
-                    } catch (DecoderFallbackException) {
-                    }
+                    textConstants.Add(i, reader.ReadString(typeof(ushort)));
                 } else if (tag == ConstantPoolTag.String) {
                     stringsIdx.Add(reader.ReadUInt16() - 1);
                 } else {
@@ -102,13 +98,13 @@ namespace XenoJavusk
             OriginalStream.Position = 0;
             DataReader reader = new DataReader(OriginalStream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new UTF8Encoding(false, true)
+                DefaultEncoding = new EscapeOutRangeEnconding("utf-8")
             };
 
             BinaryFormat format = new BinaryFormat();
             DataWriter writer = new DataWriter(format.Stream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new UTF8Encoding(false, true)
+                DefaultEncoding = new EscapeOutRangeEnconding("utf-8")
             };
 
             // Magic stamp + Version
