@@ -27,6 +27,7 @@ namespace Vifmager.Vu
 {
     using System;
     using Libgame.FileFormat;
+    using Libgame.FileFormat.Common;
     using Libgame.IO;
     using Mono.Addins;
 

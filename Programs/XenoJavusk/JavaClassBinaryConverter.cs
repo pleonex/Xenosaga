@@ -29,7 +29,9 @@ namespace XenoJavusk
     using System.Collections.Generic;
     using System.Xml.Linq;
     using Libgame.IO;
+    using Libgame.IO.Encodings;
     using Libgame.FileFormat;
+    using Libgame.FileFormat.Common;
     using Mono.Addins;
 
     [Extension]

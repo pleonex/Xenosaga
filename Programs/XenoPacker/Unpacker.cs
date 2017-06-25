@@ -30,6 +30,7 @@ namespace XenoPacker
     using System.IO;
     using System.Linq;
     using Libgame.FileFormat;
+    using Libgame.FileFormat.Common;
     using Libgame.FileSystem;
     using Libgame.IO;
     using Mono.Addins;

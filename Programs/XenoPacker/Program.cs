@@ -23,7 +23,7 @@ namespace XenoPacker
     using System;
     using System.Diagnostics;
     using System.IO;
-    using Libgame.FileFormat;
+    using Libgame.FileFormat.Common;
     using Libgame.FileSystem;
     using Libgame.IO;
 

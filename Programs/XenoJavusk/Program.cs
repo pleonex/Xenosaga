@@ -24,7 +24,7 @@ namespace XenoJavusk
     using System.IO;
     using System.Xml.Linq;
     using Libgame.IO;
-    using Libgame.FileFormat;
+    using Libgame.FileFormat.Common;
     using Libgame.FileSystem;
 
     static class Program

@@ -28,6 +28,7 @@ namespace XenoJavusk
     using System;
     using Libgame.IO;
     using Libgame.FileFormat;
+    using Libgame.FileFormat.Common;
     using Libgame.FileSystem;
     using Mono.Addins;
 
