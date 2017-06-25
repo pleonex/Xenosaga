@@ -44,7 +44,7 @@ namespace XenoJavusk
         {
             DataReader reader = new DataReader(source.Stream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new EscapeOutRangeEnconding("ascii")
+                DefaultEncoding = new EucJpEncoding()
             };
 
             // Read header
@@ -100,13 +100,13 @@ namespace XenoJavusk
             OriginalStream.Position = 0;
             DataReader reader = new DataReader(OriginalStream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new EscapeOutRangeEnconding("utf-8")
+                DefaultEncoding = new EucJpEncoding()
             };
 
             BinaryFormat format = new BinaryFormat();
             DataWriter writer = new DataWriter(format.Stream) {
                 Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new EscapeOutRangeEnconding("utf-8")
+                DefaultEncoding = new EucJpEncoding()
             };
 
             // Magic stamp + Version
