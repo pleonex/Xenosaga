@@ -28,14 +28,13 @@ namespace XenoCompiler.Text
     using System;
     using System.Drawing;
     using System.IO;
-    using System.Linq;
     using Libgame.FileFormat;
     using Libgame.FileFormat.Common;
     using Libgame.IO;
     using Mono.Addins;
 
     [Extension]
-    public class Uml : Format, IConverter<BinaryFormat, Uml>
+    public class Uml : Format, IConverter<BinaryFormat, Uml>, IConverter<Uml, Po>
     {
         public Uml Convert(BinaryFormat source)
         {
@@ -55,24 +54,31 @@ namespace XenoCompiler.Text
             if (bgOffset == 0)
                 textLength = (int)(reader.Stream.Length - 0x60);
 
-            byte[] data = reader.ReadBytes(textLength);
-            Text = reader.DefaultEncoding.GetString(data);
-
-            byte[] newData = reader.DefaultEncoding.GetBytes(Text);
-            for (int i = 0; i < newData.Length && i < data.Length; i++) {
-                if (newData[i] != data[i])
-                    throw new Exception();
-            }
-            if (!newData.SequenceEqual(data))
-                throw new Exception();
-
-
-            Text = Text.TrimEnd('\0');
+            Text = reader.ReadString(textLength).TrimEnd('\0');
 
             if (bgOffset != 0)
                 Background = Image.FromStream(new MemoryStream(reader.ReadBytes(dataLength)));
 
             return this;
+        }
+
+        public Po Convert(Uml source)
+        {
+            Po po = new Po {
+                Header = new PoHeader("Xenosaga I", "benito356@gmail.com")
+            };
+
+            po.Add(new PoEntry(source.Text) {
+                Reference = source.Filename,
+                Context = "Email " + source.Filename
+            });
+
+            return po;
+        }
+
+        public string Filename {
+            get;
+            set;
         }
 
         public Image Background {

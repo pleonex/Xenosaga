@@ -31,16 +31,16 @@
     <Reference Include="Mono.Addins">
       <HintPath>..\libgame\mono-addins\bin\Mono.Addins.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Text\ItemsConverter.cs" />
+    <Compile Include="Text\Items2Binary.cs" />
     <Compile Include="Text\Uml.cs" />
     <Compile Include="Text\XenoEncoding.cs" />
+    <Compile Include="Pack\Evt2Folder.cs" />
+    <Compile Include="Text\JavaClass2Po.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">
@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Text\" />
+    <Folder Include="Pack\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -25,34 +25,34 @@
 // THE SOFTWARE.
 namespace XenoCompiler.Text
 {
-    using System.Xml.Linq;
     using Libgame.FileFormat;
     using Libgame.FileFormat.Common;
     using Libgame.IO;
 
-    public class ItemsConverter : IConverter<BinaryFormat, XElement>
+    public class Items2Binary : IConverter<BinaryFormat, Po>
     {
-        public XElement Convert(BinaryFormat source)
+        public Po Convert(BinaryFormat source)
         {
             DataReader reader = new DataReader(source.Stream);
-            XElement xml = new XElement("items");
+            Po po = new Po {
+                Header = new PoHeader("Xenosaga I", "benito356@gmail.com")
+            };
 
             int id = 0;
             while (source.Stream.Position < source.Stream.Length) {
                 string name = reader.ReadString();
                 if (!string.IsNullOrEmpty(name)) {
-                    XElement entry = new XElement("item");
-                    entry.SetAttributeValue("id", id);
-                    entry.Add(new XElement("name", name));
-                    entry.Add(new XElement("description", reader.ReadString()));
-                    xml.Add(entry);
+                    string unit = name + ": " + reader.ReadString();
+                    po.Add(new PoEntry(unit) {
+                        Context = id.ToString()
+                    });
                 }
 
                 id++;
                 reader.ReadPadding(0x80);
             }
 
-            return xml;
+            return po;
         }
     }
 }
