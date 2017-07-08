@@ -1,10 +1,10 @@
 #!/bin/bash
 # Arguments:
-#   + $1: Input file name without extension
+#   + $1: Input audio file path
+#   + $2: Input video file path
 #   + $2: Output file path
 
 FFmpeg/ffmpeg \
-    -f data -i $1.bin \
-    -i $1.m2v \
-    -c copy -map 0:d:0 -map 1:v:0 $2.mpeg
-mv $2.mpeg $2
+    -f data -i $1 \
+    -i $2 \
+    -y -c copy -map 0:d:0 -map 1:v:0 -f mpeg $3
