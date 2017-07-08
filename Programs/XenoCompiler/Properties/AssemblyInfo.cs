@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 using Mono.Addins;
 
 [assembly: AssemblyTitle("XenoCompiler")]
-[assembly: AssemblyDescription("Import and export files from Xenosaga I")]
+[assembly: AssemblyDescription("File format converters for Xenosaga I")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Gradienwords")]
 [assembly: AssemblyProduct("Xenosaga I Trasnlation")]
