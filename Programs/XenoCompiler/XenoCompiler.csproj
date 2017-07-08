@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{9C3CAB77-FDE8-455B-BC1E-FC4FFDF05910}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>XenoCompiler</RootNamespace>
     <AssemblyName>XenoCompiler</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -41,8 +41,6 @@
     <Compile Include="Text\XenoEncoding.cs" />
     <Compile Include="Pack\Evt2Folder.cs" />
     <Compile Include="Text\JavaClass2Po.cs" />
-    <Compile Include="Cli\CommandLineInterface.cs" />
-    <Compile Include="Cli\GetLine.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">
@@ -53,7 +51,6 @@
   <ItemGroup>
     <Folder Include="Text\" />
     <Folder Include="Pack\" />
-    <Folder Include="Cli\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

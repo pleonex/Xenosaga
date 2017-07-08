@@ -34,8 +34,7 @@ namespace XenoCompiler.Text
     using Mono.Addins;
 
     [Extension]
-    public class JavaClass2Po : IConverter<BinaryFormat, Po>,
-            IConverter<Po, BinaryFormat>
+    public class JavaClass2Po : IConverter<BinaryFormat, Po>
     {
         public DataStream OriginalStream { get; set; }
 
@@ -80,62 +79,6 @@ namespace XenoCompiler.Text
             }
 
             return po;
-        }
-
-        public BinaryFormat Convert(Po source)
-        {
-            if (OriginalStream == null)
-                throw new InvalidOperationException("Cannot convert from XML without original stream");
-
-            // Get the list of strings to change
-            Dictionary<int, string> textConstants = new Dictionary<int, string>();
-            foreach (var element in source.Entries) {
-                int index = Int32.Parse(element.Context);
-                textConstants[index] = element.Translated ?? element.Original;
-            }
-
-            OriginalStream.Position = 0;
-            DataReader reader = new DataReader(OriginalStream) {
-                Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new EucJpEncoding()
-            };
-
-            BinaryFormat format = new BinaryFormat();
-            DataWriter writer = new DataWriter(format.Stream) {
-                Endianness = EndiannessMode.BigEndian,
-                DefaultEncoding = new EucJpEncoding()
-            };
-
-            // Magic stamp + Version
-            writer.Write(reader.ReadBytes(8));
-
-            // Read pool and write into new stream changing texts
-            ushort poolCount = reader.ReadUInt16();
-            writer.Write(poolCount);
-            for (int i = 0; i < poolCount - 1; i++) {
-                ConstantPoolTag tag = (ConstantPoolTag)reader.ReadByte();
-                writer.Write((byte)tag);
-
-                if (tag == ConstantPoolTag.Utf8) {
-                    var textData = reader.ReadBytes(reader.ReadUInt16());
-                    if (textConstants.ContainsKey(i))
-                        writer.Write(textConstants[i], typeof(ushort), textConstants[i].Length > 0);
-                    else {
-                        writer.Write((ushort)textData.Length);
-                        writer.Write(textData);
-                    }
-                } else {
-                    writer.Write(reader.ReadBytes(GetConstantPoolItemInfoLength(tag)));
-                }
-            }
-
-            // Write the rest of the file without changes
-            writer.Write(reader.ReadBytes((int)(OriginalStream.Length - OriginalStream.Position)));
-
-            // Clean to prevent errors
-            OriginalStream = null;
-
-            return format;
         }
 
         static int GetConstantPoolItemInfoLength(ConstantPoolTag tag)

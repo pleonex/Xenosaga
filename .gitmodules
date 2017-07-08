@@ -10,3 +10,6 @@
 [submodule "Programs/External/jd-gui"]
 	path = Programs/External/jd-gui
 	url = https://github.com/java-decompiler/jd-gui
+[submodule "Programs/SceneGate"]
+	path = Programs/SceneGate
+	url = git@github.com:SceneGate/SceneGate
