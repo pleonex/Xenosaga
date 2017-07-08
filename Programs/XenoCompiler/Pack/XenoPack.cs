@@ -1,10 +1,10 @@
 ﻿//
-// Unpacker.cs
+// XenoPack.cs
 //
 // Author:
 //       Benito Palacios Sánchez <benito356@gmail.com>
 //
-// Copyright (c) 2016 Benito Palacios Sánchez
+// Copyright (c) 2017 Benito Palacios Sánchez
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace XenoPacker
+namespace XenoCompiler.Pack
 {
     using System;
     using System.Collections.Generic;
@@ -36,7 +36,7 @@ namespace XenoPacker
     using Mono.Addins;
 
     [Extension]
-    public class Unpacker : IConverter<BinaryFormat, NodeContainerFormat>
+    public class XenoPack : IConverter<BinaryFormat, NodeContainerFormat>
     {
         public NodeContainerFormat Convert(BinaryFormat source)
         {
@@ -105,8 +105,8 @@ namespace XenoPacker
 
                 // The offset is just 3 bytes padded 0x800
                 uint offset = (uint)(reader.ReadByte() |
-                    reader.ReadByte() << 8 |
-                    reader.ReadByte() << 16);
+                                     reader.ReadByte() << 8 |
+                                     reader.ReadByte() << 16);
                 offset *= FileEntry.Padding;
 
                 // The size are the next 4 bytes.

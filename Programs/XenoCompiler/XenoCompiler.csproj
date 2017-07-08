@@ -41,6 +41,7 @@
     <Compile Include="Text\XenoEncoding.cs" />
     <Compile Include="Pack\Evt2Folder.cs" />
     <Compile Include="Text\JavaClass2Po.cs" />
+    <Compile Include="Pack\XenoPack.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libgame\libgame\libgame.csproj">
